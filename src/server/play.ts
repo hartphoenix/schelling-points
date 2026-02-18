@@ -170,6 +170,7 @@ export function onClientMessage(state: t.State, message: t.ToServerMessage, webS
             })
 
             state.games.set(gameId, newGame)
+            newGame.broadcast(currentGameState(gameId, newGame))
             state.broadcastLoungeChange()
             break
 
