@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
-import type { ScoringMode, ComputeStatus, ComputeResult } from './types'
+import type { ScoringMode, ComputeStatus, ComputeResult, ViewMode } from './types'
 import { fetchEmbedding, checkOllamaStatus } from './lib/embeddings'
 import type { OllamaStatus } from './lib/embeddings'
 import { computeScores, cosineSimilarity } from './lib/scoring'
@@ -8,6 +8,7 @@ import InputPanel from './components/InputPanel'
 import ModeSelector from './components/ModeSelector'
 import ScoreTable from './components/ScoreTable'
 import ScatterPlot from './components/ScatterPlot'
+import RadialPlot from './components/RadialPlot'
 
 export default function App() {
   const [category, setCategory] = useState('')
@@ -17,6 +18,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<ComputeResult | null>(null)
   const [ollamaStatus, setOllamaStatus] = useState<OllamaStatus>('checking')
+  const [viewMode, setViewMode] = useState<ViewMode>('scatter')
 
   // Check ollama connection on mount
   useEffect(() => {
@@ -142,12 +144,34 @@ export default function App() {
               <ScoreTable players={result.players} activeMode={activeMode} />
             </div>
             <div style={{ flex: '1 1 400px' }}>
-              <ScatterPlot
-                players={result.players}
-                categoryPoint={result.categoryPoint}
-                centroidPoint={result.centroidPoint}
-                activeMode={activeMode}
-              />
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: 8 }}>
+                {(['scatter', 'radial'] as const).map((mode) => (
+                  <label key={mode} style={{ cursor: 'pointer', fontSize: 13 }}>
+                    <input
+                      type="radio"
+                      name="viewMode"
+                      value={mode}
+                      checked={viewMode === mode}
+                      onChange={() => setViewMode(mode)}
+                    />{' '}
+                    {mode === 'scatter' ? 'Scatter' : 'Radial'}
+                  </label>
+                ))}
+              </div>
+              {viewMode === 'scatter' ? (
+                <ScatterPlot
+                  players={result.players}
+                  categoryPoint={result.categoryPoint}
+                  centroidPoint={result.centroidPoint}
+                  activeMode={activeMode}
+                />
+              ) : (
+                <RadialPlot
+                  players={result.players}
+                  activeMode={activeMode}
+                  centroidScores={result.centroidScores}
+                />
+              )}
             </div>
           </div>
         </>
