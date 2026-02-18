@@ -6,15 +6,16 @@ import * as t from '../types'
 export interface PlayerInfo {
     id: t.PlayerId,
     name: t.PlayerName,
+    mood: t.Mood,
     webSocket: ws.WebSocket,
     previousScoresAndGuesses: [number, string][],
     currentGuess?: string,
 }
 
 export type Phase =
-    | { type: 'LOBBY', timeLeft?: number, isReady: Set<t.PlayerId>, }
-    | { type: 'GUESSES', round: number, category: string, timeLeft: number, guesses: Map<t.PlayerId, string> }
-    | { type: 'SCORES', round: number, category: string, timeLeft: number, scores: Map<t.PlayerId, number> }
+    | { type: 'LOBBY', secsLeft?: number, isReady: Set<t.PlayerId>, }
+    | { type: 'GUESSES', round: number, category: string, secsLeft: number, guesses: Map<t.PlayerId, string> }
+    | { type: 'SCORES', round: number, category: string, secsLeft: number, scores: Map<t.PlayerId, number> }
 
 export interface RoundScore {
     category: string;
@@ -36,7 +37,7 @@ export class Game {
             return
         }
 
-        player!.webSocket.send(JSON.stringify(message))
+        player.webSocket.send(JSON.stringify(message))
     }
 
     broadcast(message: t.ToClientMessage) {
@@ -46,12 +47,39 @@ export class Game {
     }
 }
 
-export interface State {
-    nameChooser: names.Chooser,
-    lounge: Map<t.PlayerId, [t.PlayerName, t.Mood]>,
-    games: Map<t.GameId, Game>,
+export interface LoungeInfo {
+    playerName: t.PlayerName;
+    mood: t.Mood;
+    webSocket: ws.WebSocket;
 }
 
-export function initialState(nameChooser: names.Chooser): State {
-    return { nameChooser, lounge: new Map(), games: new Map() }
+export class State {
+    nameChooser: names.Chooser
+    lounge: Map<t.PlayerId, LoungeInfo>
+    games: Map<t.GameId, Game>
+
+    constructor(nameChooser: names.Chooser) {
+        this.nameChooser = nameChooser
+        this.lounge = new Map
+        this.games = new Map
+    }
+
+    broadcastToLounge(message: t.ToClientMessage) {
+        for (let loungeInfo of this.lounge.values()) {
+            if (loungeInfo.webSocket.readyState !== ws.WebSocket.OPEN) {
+                // TODO:
+                continue
+            }
+
+            loungeInfo.webSocket.send(JSON.stringify(message))
+        }
+    }
+
+    broadcastLoungeChange() {
+        this.broadcastToLounge({
+            type: 'MEMBER_CHANGE',
+            gameId: undefined,
+            allPlayers: [...this.lounge.entries()].map(([playerId, info]) => [playerId, info.playerName, info.mood])
+        })
+    }
 }

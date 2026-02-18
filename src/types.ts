@@ -4,20 +4,20 @@ export type GameId = string
 export type Mood = '😀' | '😐' | '😞'
 
 export type ToServerMessage =
-  | { type: 'JOIN_LOUNGE', playerId: PlayerId, playerName: PlayerName }
-  | { type: 'SET_MOOD', playerId: PlayerId, playerName: PlayerName, mood: Mood }
-  | { type: 'NEW_GAME' }
-  | { type: 'SUBSCRIBE_GAME', gameId: GameId, playerId: PlayerId, playerName: string }
-  | { type: 'READY', gameId: GameId, isReady: boolean }
+  | { type: 'JOIN_LOUNGE', playerId: PlayerId, playerName: PlayerName, mood: Mood }
+  | { type: 'SET_PLAYER_INFO', gameId?: GameId, playerId: PlayerId, playerName: PlayerName, mood: Mood }
+  | { type: 'NEW_GAME', playerId: PlayerId }
+  | { type: 'SUBSCRIBE_GAME', gameId: GameId, playerId: PlayerId, playerName: string, mood: Mood }
+  | { type: 'READY', gameId: GameId, playerId: PlayerId, isReady: boolean }
   | { type: 'GUESS', gameId: GameId, playerId: PlayerId, guess: string }
 
 export type ToClientMessage =
   | { type: 'LOUNGE', loungingPlayers: [PlayerId, PlayerName, Mood][] }
-  | { type: 'MEMBER_CHANGE', gameId: GameId, allPlayers: [PlayerId, PlayerName, Mood][] }
+  | { type: 'MEMBER_CHANGE', gameId?: GameId, allPlayers: [PlayerId, PlayerName, Mood][] }
   | { type: 'LOBBY_STATE', gameId: GameId, isReady: [PlayerId, boolean][] }
-  | { type: 'LOBBY_COUNTDOWN', gameId: GameId }
+  | { type: 'LOBBY_COUNTDOWN', gameId: GameId, secsLeft: number }
   | { type: 'GUESS_STATE', gameId: GameId, category: string, hasGuessed: [PlayerId, boolean][], secsLeft: number }
-  | { type: 'SCORE_STATE', gameId: GameId, category: string, playerScores: [PlayerId, number][] }
+  | { type: 'SCORE_STATE', gameId: GameId, category: string, playerScores: [PlayerId, number][], secsLeft: number }
   | { type: 'NO_SUCH_GAME', gameId: GameId }
 
 export type Response =
