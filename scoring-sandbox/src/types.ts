@@ -15,4 +15,12 @@ export interface PlayerResult {
 export interface ComputeResult {
   players: PlayerResult[]
   categoryPoint: { text: string; x: number; y: number }
+  centroidPoint: { x: number; y: number }
+  centroidScores: {
+    schelling: number
+    bullseye: number
+    darkHorse: number
+  }
 }
+
+export type ViewMode = 'scatter' | 'radial'

@@ -32,14 +32,19 @@ export interface RawScores {
   darkHorseScore: number
 }
 
-/** Compute all three mode scores for each response */
+export interface ScoreResult {
+  scores: RawScores[]
+  centroid: number[]
+}
+
+/** Compute all three mode scores for each response, and return the centroid vector */
 export function computeScores(
   categoryEmbedding: number[],
   responseEmbeddings: number[][],
-): RawScores[] {
+): ScoreResult {
   const cent = centroid(responseEmbeddings)
 
-  return responseEmbeddings.map((embed) => {
+  const scores = responseEmbeddings.map((embed) => {
     const simToCategory = cosineSimilarity(embed, categoryEmbedding)
     const simToCentroid = cosineSimilarity(embed, cent)
 
@@ -49,4 +54,6 @@ export function computeScores(
       darkHorseScore: simToCategory * (1 - simToCentroid),
     }
   })
+
+  return { scores, centroid: cent }
 }

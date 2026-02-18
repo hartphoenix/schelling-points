@@ -36,15 +36,15 @@ export default function ScoreTable({ players, activeMode }: ScoreTableProps) {
                 background: mode === activeMode ? '#e8e8ff' : 'transparent',
               }}
             >
-              {label}
+              {label}{mode === activeMode ? ' ▼' : ''}
             </th>
           ))}
         </tr>
       </thead>
       <tbody>
-        {sorted.map((player) => (
+        {sorted.map((player, rank) => (
           <tr key={player.index}>
-            <td style={tdStyle}>{player.index}</td>
+            <td style={tdStyle}>{rank + 1}</td>
             <td style={{ ...tdStyle, textAlign: 'left' }}>{player.text}</td>
             {columnHeaders.map(({ key, mode }) => (
               <td

@@ -1,14 +1,16 @@
+const MODEL = 'nomic-embed-text'
+const MODEL_NOT_FOUND = `Model not found. Run \`ollama pull ${MODEL}\`.`
+
 export async function fetchEmbedding(text: string): Promise<number[]> {
   const res = await fetch('/api/embeddings', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: 'nomic-embed-text', prompt: text }),
+    body: JSON.stringify({ model: MODEL, prompt: text }),
   })
 
   if (!res.ok) {
-    const body = await res.text()
-    if (body.includes('model')) {
-      throw new Error("Model not found. Run `ollama pull nomic-embed-text`.")
+    if (res.status === 404) {
+      throw new Error(MODEL_NOT_FOUND)
     }
     throw new Error('Embedding failed. Check ollama and retry.')
   }
@@ -17,7 +19,7 @@ export async function fetchEmbedding(text: string): Promise<number[]> {
 
   if (data.error) {
     if (data.error.includes('model')) {
-      throw new Error("Model not found. Run `ollama pull nomic-embed-text`.")
+      throw new Error(MODEL_NOT_FOUND)
     }
     throw new Error(`Ollama error: ${data.error}`)
   }

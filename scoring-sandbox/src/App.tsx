@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import type { ScoringMode, ComputeStatus, ComputeResult } from './types'
 import { fetchEmbedding } from './lib/embeddings'
-import { computeScores } from './lib/scoring'
+import { computeScores, cosineSimilarity } from './lib/scoring'
 import { projectTo2D } from './lib/projection'
 import InputPanel from './components/InputPanel'
 import ModeSelector from './components/ModeSelector'
@@ -49,12 +49,21 @@ export default function App() {
         ...trimmedResponses.map((r) => fetchEmbedding(r)),
       ])
 
-      // Compute scores
-      const scores = computeScores(categoryEmbedding, responseEmbeddings)
+      // Compute scores — now returns centroid vector alongside per-response scores
+      const { scores, centroid: centroidVector } = computeScores(categoryEmbedding, responseEmbeddings)
 
-      // Project to 2D (category + all responses)
+      // Project to 2D (category + all responses), then centroid separately
       const allEmbeddings = [categoryEmbedding, ...responseEmbeddings]
-      const points = projectTo2D(allEmbeddings)
+      const { points, project } = projectTo2D(allEmbeddings)
+      const [centroidPoint] = project([centroidVector])
+
+      // Centroid scores for radial reference circle
+      const centroidScores = {
+        schelling: cosineSimilarity(centroidVector, centroidVector), // always 1.0
+        bullseye: cosineSimilarity(centroidVector, categoryEmbedding),
+        darkHorse: cosineSimilarity(centroidVector, categoryEmbedding)
+                   * (1 - cosineSimilarity(centroidVector, centroidVector)), // always 0.0
+      }
 
       // Build result
       const players = trimmedResponses.map((text, i) => ({
@@ -68,6 +77,8 @@ export default function App() {
       setResult({
         players,
         categoryPoint: { text: trimmedCategory, x: points[0].x, y: points[0].y },
+        centroidPoint,
+        centroidScores,
       })
       setStatus('success')
     } catch (err) {
