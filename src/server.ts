@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const state: t.State = t.initialState(
+const state: t.State = new t.State(
     new names.Chooser(
         [
             __dirname + '/../static/adjectives.txt',
