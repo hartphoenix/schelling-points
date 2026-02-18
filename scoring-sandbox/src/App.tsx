@@ -1,6 +1,7 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import type { ScoringMode, ComputeStatus, ComputeResult } from './types'
-import { fetchEmbedding } from './lib/embeddings'
+import { fetchEmbedding, checkOllamaStatus } from './lib/embeddings'
+import type { OllamaStatus } from './lib/embeddings'
 import { computeScores, cosineSimilarity } from './lib/scoring'
 import { projectTo2D } from './lib/projection'
 import InputPanel from './components/InputPanel'
@@ -15,6 +16,12 @@ export default function App() {
   const [status, setStatus] = useState<ComputeStatus>('idle')
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<ComputeResult | null>(null)
+  const [ollamaStatus, setOllamaStatus] = useState<OllamaStatus>('checking')
+
+  // Check ollama connection on mount
+  useEffect(() => {
+    checkOllamaStatus().then(setOllamaStatus)
+  }, [])
 
   const nonEmptyResponses = responses.filter((r) => r.trim())
   const canCompute = category.trim().length > 0 && nonEmptyResponses.length >= 4
@@ -95,7 +102,20 @@ export default function App() {
 
   return (
     <div style={{ maxWidth: 960, margin: '0 auto', padding: '2rem', fontFamily: 'system-ui' }}>
-      <h1>Scoring Dashboard</h1>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <h1 style={{ margin: 0 }}>Scoring Dashboard</h1>
+        <span style={{
+          fontSize: 12,
+          padding: '2px 8px',
+          borderRadius: 4,
+          background: ollamaStatus === 'connected' ? '#e6f4ea' : ollamaStatus === 'disconnected' ? '#fce8e6' : '#f0f0f0',
+          color: ollamaStatus === 'connected' ? '#1a7f37' : ollamaStatus === 'disconnected' ? '#c00' : '#666',
+        }}>
+          {ollamaStatus === 'checking' ? 'Checking ollama…'
+           : ollamaStatus === 'connected' ? 'ollama connected'
+           : 'ollama disconnected'}
+        </span>
+      </div>
 
       <InputPanel
         category={category}
@@ -122,7 +142,12 @@ export default function App() {
               <ScoreTable players={result.players} activeMode={activeMode} />
             </div>
             <div style={{ flex: '1 1 400px' }}>
-              <ScatterPlot players={result.players} categoryPoint={result.categoryPoint} />
+              <ScatterPlot
+                players={result.players}
+                categoryPoint={result.categoryPoint}
+                centroidPoint={result.centroidPoint}
+                activeMode={activeMode}
+              />
             </div>
           </div>
         </>

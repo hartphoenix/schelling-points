@@ -14,6 +14,10 @@ export default defineConfig({
         target: 'http://localhost:11434',
         changeOrigin: true,
       },
+      '/api/tags': {
+        target: 'http://localhost:11434',
+        changeOrigin: true,
+      },
     },
   },
 })

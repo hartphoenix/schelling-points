@@ -7,26 +7,43 @@ import {
   Tooltip,
   ResponsiveContainer,
   LabelList,
+  Cell,
 } from 'recharts'
-import type { PlayerResult } from '../types'
+import type { PlayerResult, ScoringMode } from '../types'
+
+const modeKey: Record<ScoringMode, keyof PlayerResult> = {
+  schelling: 'schellingScore',
+  bullseye: 'bullseyeScore',
+  darkHorse: 'darkHorseScore',
+}
 
 interface ScatterPlotProps {
   players: PlayerResult[]
   categoryPoint: { text: string; x: number; y: number }
+  centroidPoint: { x: number; y: number }
+  activeMode: ScoringMode
 }
 
 function truncate(text: string, max = 20) {
   return text.length > max ? text.slice(0, max) + '…' : text
 }
 
-export default function ScatterPlot({ players, categoryPoint }: ScatterPlotProps) {
+/** Map a score (0–1) to a point radius (4–16px) */
+function scoreToSize(score: number): number {
+  return 4 + score * 12
+}
+
+export default function ScatterPlot({ players, categoryPoint, centroidPoint, activeMode }: ScatterPlotProps) {
+  const key = modeKey[activeMode]
   const responseData = players.map((p) => ({
     x: p.x,
     y: p.y,
     label: truncate(p.text),
+    size: scoreToSize(p[key] as number),
   }))
 
   const categoryData = [{ x: categoryPoint.x, y: categoryPoint.y, label: categoryPoint.text }]
+  const centroidData = [{ x: centroidPoint.x, y: centroidPoint.y, label: 'Centroid' }]
 
   return (
     <div>
@@ -55,14 +72,22 @@ export default function ScatterPlot({ players, categoryPoint }: ScatterPlotProps
             }}
           />
 
-          {/* Response points — blue circles */}
+          {/* Response points — blue circles, sized by active mode score */}
           <Scatter name="Responses" data={responseData} fill="#4466cc" shape="circle">
+            {responseData.map((entry, i) => (
+              <Cell key={i} r={entry.size} />
+            ))}
             <LabelList dataKey="label" position="top" fontSize={11} fill="#333" />
           </Scatter>
 
           {/* Category point — red diamond */}
           <Scatter name="Category" data={categoryData} fill="#cc3333" shape="diamond">
             <LabelList dataKey="label" position="top" fontSize={11} fill="#cc3333" />
+          </Scatter>
+
+          {/* Centroid — green circle */}
+          <Scatter name="Centroid" data={centroidData} fill="#22883e" shape="circle">
+            <LabelList dataKey="label" position="top" fontSize={11} fill="#22883e" />
           </Scatter>
         </ScatterChart>
       </ResponsiveContainer>
@@ -71,6 +96,8 @@ export default function ScatterPlot({ players, categoryPoint }: ScatterPlotProps
         <span style={{ color: '#cc3333' }}>◆ Category</span>
         {' · '}
         <span style={{ color: '#4466cc' }}>● Responses</span>
+        {' · '}
+        <span style={{ color: '#22883e' }}>● Centroid</span>
       </div>
     </div>
   )

@@ -37,3 +37,19 @@ export async function fetchEmbedding(text: string): Promise<number[]> {
 
   return embedding
 }
+
+export type OllamaStatus = 'checking' | 'connected' | 'disconnected'
+
+/** Single check: is ollama running and does it have the embedding model? */
+export async function checkOllamaStatus(): Promise<OllamaStatus> {
+  try {
+    const res = await fetch('/api/tags')
+    if (!res.ok) return 'disconnected'
+    const data = await res.json()
+    const models: { name: string }[] = data.models ?? []
+    const hasModel = models.some((m) => m.name.startsWith(MODEL))
+    return hasModel ? 'connected' : 'disconnected'
+  } catch {
+    return 'disconnected'
+  }
+}
