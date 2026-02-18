@@ -112,7 +112,7 @@ function onTickGame(gameId: t.GameId, game: t.Game, timeSecs: number, deltaSecs:
                         type: 'GUESSES',
                         round,
                         category,
-                        timeLeft: config.SCORE_SECS,
+                        timeLeft: config.GUESS_SECS,
                         guesses: new Map,
                     }
                     game.broadcast({

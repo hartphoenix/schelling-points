@@ -30,8 +30,10 @@ export class Game {
         const player = this.players.find(info => info.id === playerId)
         if (!player) {
             // TODO:
+            return
         } else if (player.webSocket.readyState !== ws.WebSocket.OPEN) {
             // TODO:
+            return
         }
 
         player!.webSocket.send(JSON.stringify(message))
