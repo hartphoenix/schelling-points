@@ -3,8 +3,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "esbuild src/client.tsx --bundle --minify --outfile=static/client.js",
-    "dev": "tsx src/server.ts"
+    "dev": "concurrently \"bun run dev:server\" \"bun run dev:client\"",
+    "dev:server": "tsx --watch src/server.ts",
+    "dev:client": "vite",
+    "build": "vite build",
+    "start": "tsx src/server.ts"
   },
   "dependencies": {
     "howler": "^2.2.4",
@@ -18,9 +21,11 @@
     "@types/node": "^25.2.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "esbuild": "^0.27.3",
+    "@vitejs/plugin-react": "^5.1.4",
+    "concurrently": "^9.2.1",
     "express": "^5.2.1",
     "express-ws": "^5.0.2",
-    "tsx": "^4.21.0"
+    "tsx": "^4.21.0",
+    "vite": "^7.3.1"
   }
 }

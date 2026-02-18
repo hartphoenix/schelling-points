@@ -30,5 +30,9 @@ api.addRest(
     app,
 )
 
+api.addStatic(
+    app,
+)
+
 const webServer = http.createServer(app)
 webServer.listen(8000, '0.0.0.0')

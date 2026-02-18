@@ -21,7 +21,7 @@ export type State = {
 export function initialState(): State {
   const audioPlayer = new audio.Player('/static')
   const websocketProtocol = document.location.protocol == 'http:' ? 'ws' : 'wss'
-  const mailbox = new mail.Box(new WebSocket(`${websocketProtocol}://${window.location.host}`))
+  const mailbox = new mail.Box(new WebSocket(`${websocketProtocol}://${window.location.host}/ws`))
 
   // TODO: Check local storage for existing playerId and playerName
   return {
