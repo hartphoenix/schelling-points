@@ -2,3 +2,5 @@
 docs/
 static/client.js
 node_modules
+scoring-sandbox/node_modules/
+scoring-sandbox/dist/
