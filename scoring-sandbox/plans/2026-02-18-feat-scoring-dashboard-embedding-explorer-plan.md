@@ -4,6 +4,7 @@ type: feat
 status: completed
 date: 2026-02-18
 source: scoring-sandbox/plans/scoring-dashboard-brief.md
+pr: https://github.com/hartphoenix/schelling-points/pull/5
 ---
 
 # Scoring Dashboard — Embedding-Based Scoring Explorer
@@ -136,7 +137,7 @@ When any input changes after a successful Compute, clear the result. The user re
 }
 ```
 
-**Package manager:** `bun` (per workspace conventions — will create `bun.lockb`)
+**Package manager:** `bun` (per workspace conventions — creates `bun.lock`)
 
 **Math libraries:**
 - `ml-pca` for PCA projection (deterministic, simple API)
@@ -169,7 +170,7 @@ When any input changes after a successful Compute, clear the result. The user re
 
 ### Technical Requirements
 
-- [x] All files inside `scoring-sandbox/` — no edits to parent project
+- [x] All files inside `scoring-sandbox/` — no edits to parent project (exception: root `.gitignore` updated to exclude `scoring-sandbox/node_modules/` and `scoring-sandbox/dist/`)
 - [x] Vite proxy at `/api/embeddings` → `http://localhost:11434/api/embeddings` with `changeOrigin: true`
 - [x] No routing, no backend, no persistence, no auth
 - [x] Runs with `bun install && bun run dev` from `scoring-sandbox/`
@@ -254,6 +255,18 @@ When any input changes after a successful Compute, clear the result. The user re
 - Table-to-plot hover interaction
 - Reset button (results clear on input change; full reset is manual for now)
 - Test suite (pure math functions are unit-testable but not required for this tool)
+
+## Testing Notes
+
+Build and type-check pass. Runtime integration verified via scripted tests against live ollama:
+
+- Vite dev server serves the page and proxies `/api/embeddings` correctly
+- `nomic-embed-text` returns 768-dim embeddings for all test inputs
+- Scoring formulas produce expected rankings (e.g. "dog" > "refrigerator" on Bullseye for category "animals")
+- PCA projection clusters semantically similar responses closer together (dog↔cat distance < dog↔refrigerator distance)
+- Error handling: ollama returns 404 for unknown models, detected correctly by `embeddings.ts`
+
+Manual browser testing (entering inputs, clicking Compute, visual table/plot inspection) not yet performed.
 
 ## References
 
