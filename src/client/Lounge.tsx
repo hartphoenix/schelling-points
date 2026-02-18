@@ -1,20 +1,25 @@
-import { useState, type JSX } from "react"
-import { Box } from "./mail"
-import * as t from "./types"
+import * as React from 'react'
+import * as t from './types'
+import { Box } from './mail'
 
-export const Lounge = ({ state }: { state: t.State }): JSX.Element => {
-  const [playerName, setPlayerName] = useState('')
-  const [joined, setJoined] = useState(false)
+type Props = {
+  mailbox: Box
+  playerId: t.PlayerId
+  otherPlayers: [t.PlayerId, t.PlayerName, t.Mood][]
+}
+
+export function Lounge({ mailbox, playerId, otherPlayers }: Props) {
+  const [playerName, setPlayerName] = React.useState('')
+  const [joined, setJoined] = React.useState(false)
 
   function handleJoin() {
     if (!playerName.trim()) return
-    state.mailbox.send({ type: 'JOIN_LOUNGE', playerId: state.playerId, playerName })
+    mailbox.send({ type: 'JOIN_LOUNGE', playerId, playerName })
     setJoined(true)
-    {/* need to ensure server handles player join & state updates view */ }
   }
 
   function handleNewGame() {
-    state.mailbox.send({ type: 'NEW_GAME' })
+    mailbox.send({ type: 'NEW_GAME' })
   }
 
   if (!joined) {
@@ -37,7 +42,7 @@ export const Lounge = ({ state }: { state: t.State }): JSX.Element => {
     <div className="lounge">
       <h1>Lounge</h1>
       <ul>
-        {state.otherPlayers.map(([id, name, mood]) => (
+        {otherPlayers.map(([id, name, mood]) => (
           <li key={id}>{mood} {name}</li>
         ))}
       </ul>

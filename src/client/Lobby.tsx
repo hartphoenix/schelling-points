@@ -14,8 +14,8 @@ export function Lobby({ mailbox, playerId, gameId, isReady, otherPlayers }: Prop
   const nameOf = new Map(otherPlayers.map(([id, name]) => [id, name]))
 
   function handleToggleReady() {
-    // BLOCKED: no TOGGLE_READY message type yet
-    console.warn('TOGGLE_READY not yet in types.ts')
+    const currentlyReady = isReady.find(([id]) => id === playerId)?.[1] ?? false
+    mailbox.send({ type: 'READY', gameId, isReady: !currentlyReady })
   }
 
   return (

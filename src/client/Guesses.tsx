@@ -1,5 +1,6 @@
 import * as React from 'react'
 import * as t from './types'
+import { Box } from './mail'
 
 function Timer(props: { secsLeft: number }) {
     return <div>{props.secsLeft}s</div>
@@ -10,7 +11,7 @@ function GuessInput(props: { onSubmit: (guess: string) => void }) {
 
     return (
         <div>
-            <input 
+            <input
                 type="text"
                 value={guess}
                 onChange={(e) => setGuess(e.target.value)}
@@ -29,24 +30,31 @@ function PlayerProgress(props: { hasGuessed: [string, boolean][] }) {
     return <div>{lockedIn} of {total} locked in</div>
 }
 
-export function Guesses(props: { state: t.State }) {
-    const view = props.state.view as t.View & { type: 'GUESSES' }
+type Props = {
+    mailbox: Box
+    playerId: t.PlayerId
+    gameId: t.GameId
+    category: string
+    secsLeft: number
+    hasGuessed: [t.PlayerId, boolean][]
+}
 
+export function Guesses({ mailbox, playerId, gameId, category, secsLeft, hasGuessed }: Props) {
     function handleSubmit(guess: string) {
-        props.state.mailbox.send({
+        mailbox.send({
             type: 'GUESS',
-            gameId: view.gameId,
-            playerId: props.state.playerId,
+            gameId,
+            playerId,
             guess,
         })
     }
 
     return (
         <div>
-            <Timer secsLeft={view.secsLeft} />
-            <h1>{view.category}</h1>
+            <Timer secsLeft={secsLeft} />
+            <h1>{category}</h1>
             <GuessInput onSubmit={handleSubmit} />
-            <PlayerProgress hasGuessed={view.hasGuessed} />
+            <PlayerProgress hasGuessed={hasGuessed} />
         </div>
     )
 }
