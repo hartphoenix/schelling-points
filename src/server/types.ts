@@ -11,13 +11,37 @@ export interface PlayerInfo {
     currentGuess?: string,
 }
 
-export interface Game {
-    players: PlayerInfo[],
-    category?: string
+export type Phase =
+    | { type: 'LOBBY', timeLeft?: number, isReady: Set<t.PlayerId>, }
+    | { type: 'GUESSES', round: number, category: string, timeLeft: number, guesses: Map<t.PlayerId, string> }
+    | { type: 'SCORES', round: number, category: string, timeLeft: number, scores: Map<t.PlayerId, number> }
+
+export interface RoundScore {
+    category: string;
+    guessesAndScores: [t.PlayerId, string, number][],
 }
 
-export function newGame(): Game {
-    return { players: [], category: undefined }
+export class Game {
+    players: PlayerInfo[] = []
+    phase: Phase = { type: 'LOBBY', isReady: new Set() }
+    previousScores: RoundScore[] = []
+
+    unicast(playerId: t.PlayerId, message: t.ToClientMessage) {
+        const player = this.players.find(info => info.id === playerId)
+        if (!player) {
+            // TODO:
+        } else if (player.webSocket.readyState !== ws.WebSocket.OPEN) {
+            // TODO:
+        }
+
+        player!.webSocket.send(JSON.stringify(message))
+    }
+
+    broadcast(message: t.ToClientMessage) {
+        for (let player of this.players) {
+            this.unicast(player.id, message)
+        }
+    }
 }
 
 export interface State {
