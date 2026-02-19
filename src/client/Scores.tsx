@@ -1,6 +1,7 @@
 import * as t from './types'
 import * as React from 'react'
 import * as config from '../config'
+import { Timer } from './components/timer'
 
 type Props = {
   gameId: t.GameId
@@ -23,11 +24,11 @@ function RoundTopbar({ round, totalRounds, secsLeft }: {
   return (
     <div className="screen-topbar">
       {round !== undefined
-        ? <span>Round {round +1} of {totalRounds}</span>
+        ? <span>Round {round + 1} of {totalRounds}</span>
         : <span />
       }
       {secsLeft !== undefined
-        ? <span>{Math.ceil(secsLeft)}s</span>
+        ? <span><Timer secsLeft={secsLeft} />s</span>
         : <span />
       }
     </div>
