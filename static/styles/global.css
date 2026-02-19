@@ -117,6 +117,10 @@ p {
     font-weight: 300;
 }
 
+.input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
 .btn-back {
     display: flex;
     align-items: center;
@@ -135,8 +139,14 @@ p {
     cursor: pointer;
 }
 
-.input::placeholder {
-    color: rgba(255, 255, 255, 0.3);
+.btn-qr {
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.btn-qr:hover {
+    opacity: 1;
 }
 
 .screen-header h1{
@@ -149,7 +159,7 @@ p {
 
 .screen-header h2 {
     font-family: var(--font-body);
-    color: rgba(255, 255, 255, 0.35);
+    color: rgba(255, 255, 255, 0.4);
     text-align: center;
     letter-spacing: .15em;
     font-size: 0.85rem;
