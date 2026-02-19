@@ -1,5 +1,7 @@
 import * as t from './types'
 import { Box } from './mail'
+import type { JSX } from 'react'
+import { QRCode } from 'react-qrcode-logo'
 
 type Props = {
   mailbox: Box
@@ -19,6 +21,35 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, otherPlaye
     mailbox.send({ type: 'LOBBY_READY', gameId, playerId, isReady: !currentlyReady })
   }
 
+  function qrCodeButton(url: string): JSX.Element {
+    return (<>
+      <button popoverTarget="qr-popover">[QR code]</button>
+      <div id="qr-popover" popover="auto">
+        <QRCode
+          value={url}
+          size={180}
+          qrStyle="dots"
+          bgColor="transparent"
+          fgColor="#E0E0E0"
+          eyeRadius={8}
+          eyeColor="#7C4DFF"
+          quietZone={8}
+          ecLevel="M"
+        />
+      </div>
+    </>)
+  }
+
+  function copyUrlButton(url: string): JSX.Element {
+    navigator.clipboard.writeText(url)
+    return (<>
+      <button popoverTarget="copy-popover">[copy URL]</button>
+      <div id="qr-popover" popover="auto">
+        copied!
+      </div>
+    </>)
+  }
+
   return (
     <div className="lobby">
       <h2>Game: {gameId}</h2>
@@ -34,7 +65,7 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, otherPlaye
       <button onClick={handleToggleReady}>
         {isReady.find(([id]) => id === playerId)?.[1] ? 'Unready' : 'Ready'}
       </button>
-      {/* TODO: QR code + copy URL for sharing */}
+      <copyUrlButton url={'game-URL'} />
     </div>
   )
 } 
