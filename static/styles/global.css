@@ -36,6 +36,7 @@ body {
 }
 
 .screen { 
+    border: 1px solid rgba(255, 255, 255, 0.1);
     width: 100%;
     max-width: 430px;
     min-height: 100vh;
@@ -43,11 +44,23 @@ body {
     flex-direction: column;
     align-items: center;
     margin: 0 auto;
-    padding: 60px 32px; 
+    padding: 20px 20px; 
+    gap: 50px; 
 }
 
-.title-block {
-    margin-top: 75%;
+.screen-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.screen-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+    gap: 10px;
 }
 
 .screen-footer {
@@ -57,36 +70,17 @@ body {
     width: 90%;
     gap: 25px;
     margin-top: auto;
-}
-
-.title {
-    font-family: var(--font-fancy);
-    color: var(--cream);
-    text-align: center;
-    font-size: 3rem;
-    letter-spacing: 0.01em;
-    margin-bottom: 10px;
-}
-
-.subtitle {
-    font-family: var(--font-body);
-    color: rgba(255, 255, 255, 0.35);
-    text-align: center;
-    letter-spacing: .15em;
-    font-size: 0.85rem;
-    font-weight: 300;
-    text-transform: uppercase;
-    margin-bottom: 32px;
+    margin-bottom: 18px;
 }
 
 .btn {
     width: 100%;
     padding: 18px;
     border-radius: 9999px;
+    border: 1px solid  rgba(255, 255, 255, 0.1);
     background: rgba(255, 255, 255, 0.06);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid  rgba(255, 255, 255, 0.1);
     font-family: var(--font-body);
     color: rgba(255, 255, 255, 0.7);
     text-align: center;
@@ -95,16 +89,17 @@ body {
     font-weight: 300;
     text-transform: uppercase;
     transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 .input {
     width: 96%;
     padding: 16px 20px; 
     border-radius: 12px;
+    border: 1px solid  rgba(255, 255, 255, 0.1);
     background: rgba(255, 255, 255, 0.06); 
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid  rgba(255, 255, 255, 0.1);
     font-family: var(--font-body);
     color: var(--cream);
     letter-spacing: .12em;
@@ -112,6 +107,42 @@ body {
     font-weight: 300;
 }
 
+.btn-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px; 
+    padding-bottom: 3px;
+    border-radius: 50%;
+    border: 1px solid  rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.06);
+    font-family: var(--font-body);
+    color: var(--cream);
+    font-size: 2.5rem;
+    font-weight: 200;
+    text-align: center;
+    cursor: pointer;
+}
+
 .input::placeholder {
     color: rgba(255, 255, 255, 0.3);
+}
+
+.screen-header h1{
+    font-family: var(--font-fancy);
+    color: var(--cream);
+    text-align: center;
+    font-size: 2.75rem;
+    letter-spacing: 0.01em;
+}
+
+.screen-header h2 {
+    font-family: var(--font-body);
+    color: rgba(255, 255, 255, 0.35);
+    text-align: center;
+    letter-spacing: .15em;
+    font-size: 0.85rem;
+    font-weight: 300;
+    text-transform: uppercase;
 }
