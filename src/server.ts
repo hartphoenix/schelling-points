@@ -2,6 +2,7 @@ import express from 'express'
 import http from 'http'
 import * as api from './server/api'
 import * as names from './server/names'
+import * as play from './server/play'
 import * as t from './server/types'
 import * as categories from './server/categories'
 
@@ -39,6 +40,8 @@ api.addRest(
 api.addStatic(
     app,
 )
+
+play.startTicking(state, 100)
 
 const webServer = http.createServer(app)
 webServer.listen(8000, '0.0.0.0')

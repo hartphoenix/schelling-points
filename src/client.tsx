@@ -11,10 +11,14 @@ function onMessage(state: t.State, message: t.ToClientMessage): t.State {
     case 'LOUNGE':
       return { ...state, view: { type: 'LOUNGE' } }
 
-    case 'MEMBER_CHANGE':
+    case 'MEMBER_CHANGE': {
+      const viewGameId = 'gameId' in state.view ? state.view.gameId : undefined
+      if (message.gameId !== viewGameId) return state
       return { ...state, otherPlayers: message.allPlayers }
+    }
 
     case 'LOBBY_STATE':
+      console.log(message)
       return { ...state, view: { type: 'LOBBY', gameId: message.gameId, isReady: message.isReady } }
 
     case 'GUESS_STATE':
@@ -23,9 +27,10 @@ function onMessage(state: t.State, message: t.ToClientMessage): t.State {
     case 'SCORE_STATE':
       return { ...state, view: { type: 'SCORES', gameId: message.gameId, scores: message.playerScores, category: message.category } }
 
-    case 'LOBBY_COUNTDOWN':
-      // TODO: start countdown animation
-      return state
+    case 'LOBBY_COUNTDOWN': {
+      const isReady = state.view.type === 'LOBBY' ? state.view.isReady : []
+      return { ...state, view: { type: 'LOBBY', gameId: message.gameId, isReady, secsLeft: message.secsLeft } }
+    }
 
     case 'NO_SUCH_GAME':
       // TODO: Create notification?
@@ -45,6 +50,7 @@ function App() {
       return <Lounge
         mailbox={state.mailbox}
         playerId={state.playerId}
+        mood={state.mood}
         otherPlayers={state.otherPlayers}
       />
 
@@ -54,6 +60,7 @@ function App() {
         playerId={state.playerId}
         gameId={state.view.gameId}
         isReady={state.view.isReady}
+        secsLeft={state.view.secsLeft}
         otherPlayers={state.otherPlayers}
       />
 

@@ -7,7 +7,7 @@ export type ToServerMessage =
   | { type: 'JOIN_LOUNGE', playerId: PlayerId, playerName: PlayerName, mood: Mood }
   | { type: 'SET_PLAYER_INFO', gameId?: GameId, playerId: PlayerId, playerName: PlayerName, mood: Mood }
   | { type: 'NEW_GAME', playerId: PlayerId }
-  | { type: 'SUBSCRIBE_GAME', gameId: GameId, playerId: PlayerId, playerName: string, mood: Mood }
+  | { type: 'SUBSCRIBE_GAME', gameId: GameId, playerId: PlayerId, playerName: PlayerName, mood: Mood }
   | { type: 'READY', gameId: GameId, playerId: PlayerId, isReady: boolean }
   | { type: 'GUESS', gameId: GameId, playerId: PlayerId, guess: string }
 
