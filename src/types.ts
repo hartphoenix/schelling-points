@@ -8,7 +8,8 @@ export type ToServerMessage =
   | { type: 'SET_PLAYER_INFO', gameId?: GameId, playerId: PlayerId, playerName: PlayerName, mood: Mood }
   | { type: 'NEW_GAME', playerId: PlayerId }
   | { type: 'SUBSCRIBE_GAME', gameId: GameId, playerId: PlayerId, playerName: PlayerName, mood: Mood }
-  | { type: 'READY', gameId: GameId, playerId: PlayerId, isReady: boolean }
+  | { type: 'LOBBY_READY', gameId: GameId, playerId: PlayerId, isReady: boolean }
+  | { type: 'SCORES_READY', gameId: GameId, playerId: PlayerId, isReady: boolean }
   | { type: 'GUESS', gameId: GameId, playerId: PlayerId, guess: string }
 
 export type ToClientMessage =
@@ -17,7 +18,7 @@ export type ToClientMessage =
   | { type: 'LOBBY_STATE', gameId: GameId, isReady: [PlayerId, boolean][] }
   | { type: 'LOBBY_COUNTDOWN', gameId: GameId, secsLeft: number }
   | { type: 'GUESS_STATE', gameId: GameId, category: string, hasGuessed: [PlayerId, boolean][], secsLeft: number }
-  | { type: 'SCORE_STATE', gameId: GameId, category: string, playerScores: [PlayerId, number][], secsLeft: number }
+  | { type: 'SCORE_STATE', gameId: GameId, category: string, playerScores: [PlayerId, number][], isReady: [PlayerId, boolean][], secsLeft: number }
   | { type: 'NO_SUCH_GAME', gameId: GameId }
 
 export type Response =

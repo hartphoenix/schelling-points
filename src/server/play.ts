@@ -66,6 +66,7 @@ function onTickGame(gameId: t.GameId, game: t.Game, timeSecs: number, deltaSecs:
           round: phase.round,
           category: phase.category,
           secsLeft: config.SCORE_SECS,
+          isReady: new Set<string>(),
           scores,
         }
         game.broadcast(currentGameState(gameId, game))
@@ -75,7 +76,7 @@ function onTickGame(gameId: t.GameId, game: t.Game, timeSecs: number, deltaSecs:
 
     case 'SCORES': {
       phase.secsLeft = Math.max(0, phase.secsLeft - deltaSecs)
-
+      // TODO: need skip-ahead logic if all players are ready
       if (phase.secsLeft === 0) {
         const round = phase.round + 1
 
@@ -189,7 +190,7 @@ export function onClientMessage(state: t.State, message: t.ToServerMessage, webS
       break
     }
 
-    case 'READY': {
+    case 'LOBBY_READY': {
       const game = state.games.get(message.gameId)
       if (!game || game.phase.type !== 'LOBBY') {
         console.warn('READY: game not found or not in LOBBY phase', message.gameId)
@@ -217,8 +218,13 @@ export function onClientMessage(state: t.State, message: t.ToServerMessage, webS
 
       break
     }
+    case 'SCORES_READY': {
+      // TODO: similar to LOBBY_READY message flow
+      break
+    }
 
     case 'GUESS': {
+      //TODO: if this is the final player to submit a guess, skip the clock & switch to scores
       const game = state.games.get(message.gameId)
       if (!game || game.phase.type !== 'GUESSES') {
         console.warn('GUESS: game not found or not in GUESSES phase', message.gameId)
@@ -264,6 +270,7 @@ function currentGameState(gameId: t.GameId, game: t.Game): t.ToClientMessage {
         gameId,
         category: phase.category,
         playerScores: [...phase.scores.entries()],
+        isReady: game.players.map(info => [info.id, phase.isReady.has(info.id)]),
         secsLeft: phase.secsLeft,
       }
     }

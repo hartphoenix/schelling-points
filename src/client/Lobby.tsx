@@ -16,7 +16,7 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, otherPlaye
 
   function handleToggleReady() {
     const currentlyReady = isReady.find(([id]) => id === playerId)?.[1] ?? false
-    mailbox.send({ type: 'READY', gameId, playerId, isReady: !currentlyReady })
+    mailbox.send({ type: 'LOBBY_READY', gameId, playerId, isReady: !currentlyReady })
   }
 
   return (
@@ -30,11 +30,10 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, otherPlaye
         ))}
       </ul>
       {secsLeft !== undefined
-        ? <p>Starting in {Math.ceil(secsLeft)}...</p>
-        : <button onClick={handleToggleReady}>
-            {isReady.find(([id]) => id === playerId)?.[1] ? 'Unready' : 'Ready'}
-          </button>
-      }
+        && <p>Starting in {Math.ceil(secsLeft)}...</p>}
+      <button onClick={handleToggleReady}>
+        {isReady.find(([id]) => id === playerId)?.[1] ? 'Unready' : 'Ready'}
+      </button>
       {/* TODO: QR code + copy URL for sharing */}
     </div>
   )
