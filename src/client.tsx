@@ -1,10 +1,25 @@
 import * as React from 'react'
+import * as Router from 'react-router'
 import * as ReactDOM from "react-dom/client"
 import * as t from "./client/types"
 import { Guesses } from "./client/Guesses"
 import { Lounge } from "./client/Lounge"
 import { Lobby } from "./client/Lobby"
 import { Scores } from "./client/Scores"
+
+const router = Router.createBrowserRouter([
+  {
+    path: "/",
+    Component: () => <App />,
+  },
+  {
+    path: "game/:gameId",
+    Component: () => {
+      const { gameId } = Router.useParams()
+      return <App gameId={gameId!} />
+    },
+  },
+])
 
 function onMessage(state: t.State, message: t.ToClientMessage): t.State {
   switch (message.type) {
@@ -38,12 +53,27 @@ function onMessage(state: t.State, message: t.ToClientMessage): t.State {
   }
 }
 
-function App() {
+export interface Props {
+  gameId?: t.GameId
+}
+function App({ gameId }: Props) {
   let [state, dispatch] = React.useReducer(onMessage, t.initialState())
 
   React.useEffect(() => {
     state.mailbox.listen(dispatch)
   }, [])
+
+  React.useEffect(() => {
+    if (!gameId) return
+
+    state.mailbox.send({
+      type: 'SUBSCRIBE_GAME',
+      gameId,
+      playerId: state.playerId,
+      playerName: state.playerName,
+      mood: state.mood,
+    })
+  }, [gameId])
 
   switch (state.view.type) {
     case 'LOUNGE':
@@ -92,6 +122,6 @@ function App() {
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <App />
+    <Router.RouterProvider router={router} />
   </React.StrictMode>
 )
