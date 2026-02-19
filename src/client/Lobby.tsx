@@ -2,6 +2,7 @@ import * as t from './types'
 import { Box } from './mail'
 import type { JSX } from 'react'
 import { QRCode } from 'react-qrcode-logo'
+import { Timer } from './components/timer'
 
 type Props = {
   mailbox: Box
@@ -63,7 +64,7 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, otherPlaye
         ))}
       </ul>
       {secsLeft !== undefined
-        && <p>Starting in {Math.ceil(secsLeft)}...</p>}
+        && <p>Starting in {Timer({ secsLeft })}...</p>}
       <button onClick={handleToggleReady}>
         {isReady.find(([id]) => id === playerId)?.[1] ? 'Unready' : 'Ready'}
       </button>
