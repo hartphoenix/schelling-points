@@ -5,21 +5,24 @@ import { Box } from './mail'
 type Props = {
   mailbox: Box
   playerId: t.PlayerId
+  mood: t.Mood
   otherPlayers: [t.PlayerId, t.PlayerName, t.Mood][]
 }
 
-export function Lounge({ mailbox, playerId, otherPlayers }: Props) {
-  const [playerName, setPlayerName] = React.useState('')
+export function Lounge({ mailbox, playerId, mood, otherPlayers }: Props) {
+  const savedName = localStorage.getItem('playerName') ?? ''
+  const [playerName, setPlayerName] = React.useState(savedName)
   const [joined, setJoined] = React.useState(false)
 
   function handleJoin() {
     if (!playerName.trim()) return
-    mailbox.send({ type: 'JOIN_LOUNGE', playerId, playerName })
+    localStorage.setItem('playerName', playerName)
+    mailbox.send({ type: 'JOIN_LOUNGE', playerId, playerName, mood })
     setJoined(true)
   }
 
   function handleNewGame() {
-    mailbox.send({ type: 'NEW_GAME' })
+    mailbox.send({ type: 'NEW_GAME', playerId })
   }
 
   if (!joined) {
@@ -47,7 +50,7 @@ export function Lounge({ mailbox, playerId, otherPlayers }: Props) {
         ))}
       </ul>
       <button onClick={handleNewGame}>New Game</button>
-      {/* TODO: mood picker — sends SET_MOOD */}
+      {/* TODO: mood picker — sends SET_PLAYER_INFO */}
     </div>
   )
 }

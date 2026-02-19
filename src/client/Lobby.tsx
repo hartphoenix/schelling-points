@@ -6,16 +6,17 @@ type Props = {
   playerId: t.PlayerId
   gameId: t.GameId
   isReady: [t.PlayerId, boolean][]
+  secsLeft?: number
   otherPlayers: [t.PlayerId, t.PlayerName, t.Mood][]
 }
 
-export function Lobby({ mailbox, playerId, gameId, isReady, otherPlayers }: Props) {
+export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, otherPlayers }: Props) {
   // Build a name lookup from otherPlayers
   const nameOf = new Map(otherPlayers.map(([id, name]) => [id, name]))
 
   function handleToggleReady() {
     const currentlyReady = isReady.find(([id]) => id === playerId)?.[1] ?? false
-    mailbox.send({ type: 'READY', gameId, isReady: !currentlyReady })
+    mailbox.send({ type: 'READY', gameId, playerId, isReady: !currentlyReady })
   }
 
   return (
@@ -28,9 +29,12 @@ export function Lobby({ mailbox, playerId, gameId, isReady, otherPlayers }: Prop
           </li>
         ))}
       </ul>
-      <button onClick={handleToggleReady}>
-        {isReady.find(([id]) => id === playerId)?.[1] ? 'Unready' : 'Ready'}
-      </button>
+      {secsLeft !== undefined
+        ? <p>Starting in {Math.ceil(secsLeft)}...</p>
+        : <button onClick={handleToggleReady}>
+            {isReady.find(([id]) => id === playerId)?.[1] ? 'Unready' : 'Ready'}
+          </button>
+      }
       {/* TODO: QR code + copy URL for sharing */}
     </div>
   )

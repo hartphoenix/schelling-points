@@ -30,10 +30,10 @@ export class Game {
     unicast(playerId: t.PlayerId, message: t.ToClientMessage) {
         const player = this.players.find(info => info.id === playerId)
         if (!player) {
-            // TODO:
+            console.warn('unicast: player not found', playerId)
             return
         } else if (player.webSocket.readyState !== ws.WebSocket.OPEN) {
-            // TODO:
+            console.warn('unicast: WebSocket not open', playerId)
             return
         }
 
@@ -45,10 +45,18 @@ export class Game {
             this.unicast(player.id, message)
         }
     }
+
+    memberChangeMessage(gameId: t.GameId): t.ToClientMessage {
+        return {
+            type: 'MEMBER_CHANGE',
+            gameId,
+            allPlayers: this.players.map(info => [info.id, info.name, info.mood]),
+        }
+    }
 }
 
 export interface LoungeInfo {
-    playerName: t.PlayerName;
+    name: t.PlayerName;
     mood: t.Mood;
     webSocket: ws.WebSocket;
 }
@@ -67,7 +75,7 @@ export class State {
     broadcastToLounge(message: t.ToClientMessage) {
         for (let loungeInfo of this.lounge.values()) {
             if (loungeInfo.webSocket.readyState !== ws.WebSocket.OPEN) {
-                // TODO:
+                console.warn('broadcastToLounge: stale WebSocket, skipping')
                 continue
             }
 
@@ -79,7 +87,7 @@ export class State {
         this.broadcastToLounge({
             type: 'MEMBER_CHANGE',
             gameId: undefined,
-            allPlayers: [...this.lounge.entries()].map(([playerId, info]) => [playerId, info.playerName, info.mood])
+            allPlayers: [...this.lounge.entries()].map(([playerId, info]) => [playerId, info.name, info.mood])
         })
     }
 }
