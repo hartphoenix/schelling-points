@@ -159,6 +159,7 @@ export function onClientMessage(state: t.State, message: t.ToServerMessage, webS
         previousScoresAndGuesses: [],
         currentGuess: undefined,
       })
+      newGame.broadcast(currentGameState(gameId, newGame))
 
       state.games.set(gameId, newGame)
       state.broadcastLoungeChange()
@@ -169,6 +170,12 @@ export function onClientMessage(state: t.State, message: t.ToServerMessage, webS
       const game = state.games.get(message.gameId)
       if (!game) {
         console.warn('SUBSCRIBE_GAME: game not found', message.gameId)
+        state.lounge.set(message.playerId, {
+          name: message.playerName,
+          mood: message.mood,
+          webSocket,
+        })
+        state.broadcastLoungeChange()
         break
       }
 

@@ -64,6 +64,14 @@ function App({ gameId }: Props) {
   }, [])
 
   React.useEffect(() => {
+    if (state.view.type === 'LOUNGE') {
+      window.history.replaceState(null, '', '/')
+    } else if ('gameId' in state.view) {
+      window.history.replaceState(null, '', `/game/${state.view.gameId}`)
+    }
+  }, [state.view])
+
+  React.useEffect(() => {
     if (!gameId) return
 
     state.mailbox.send({
