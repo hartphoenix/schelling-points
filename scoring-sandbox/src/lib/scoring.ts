@@ -41,17 +41,24 @@ export interface ScoreResult {
 export function computeScores(
   categoryEmbedding: number[],
   responseEmbeddings: number[][],
+  darkHorseParams?: { exponent: number; floor: number },
 ): ScoreResult {
   const cent = centroid(responseEmbeddings)
+  const exp = darkHorseParams?.exponent ?? 1
+  const floor = darkHorseParams?.floor ?? 0
 
   const scores = responseEmbeddings.map((embed) => {
     const simToCategory = cosineSimilarity(embed, categoryEmbedding)
     const simToCentroid = cosineSimilarity(embed, cent)
 
+    const darkHorseScore = simToCategory >= floor
+      ? Math.pow(simToCategory, exp) * (1 - simToCentroid)
+      : 0
+
     return {
       schellingScore: simToCentroid,
       bullseyeScore: simToCategory,
-      darkHorseScore: simToCategory * (1 - simToCentroid),
+      darkHorseScore,
     }
   })
 

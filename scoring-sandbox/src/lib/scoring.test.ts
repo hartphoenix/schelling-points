@@ -73,4 +73,41 @@ describe('computeScores', () => {
     expect(cent[1]).toBeCloseTo(0.55)
     expect(cent[2]).toBeCloseTo(0)
   })
+
+  it('exponent amplification shrinks darkHorse for sub-1 bullseye scores', () => {
+    // Custom vectors where responses diverge enough that simToCentroid < 1
+    const cat = [1, 0, 0]
+    const resps = [
+      [1, 0, 0],     // bullseye = 1.0 (squaring 1 stays 1)
+      [0, 0, 1],     // orthogonal spread
+      [0.7, 0.7, 0], // bullseye ~0.71 (sub-1, squaring shrinks it)
+      [0, 1, 0],     // orthogonal spread
+    ]
+    const defaultResult = computeScores(cat, resps)
+    const expResult = computeScores(cat, resps, { exponent: 2, floor: 0 })
+    // Response 2 has bullseye < 1 and simToCentroid < 1, so darkHorse is positive
+    // Squaring the sub-1 bullseye shrinks darkHorse
+    expect(defaultResult.scores[2].darkHorseScore).toBeGreaterThan(0)
+    expect(expResult.scores[2].darkHorseScore).toBeLessThan(
+      defaultResult.scores[2].darkHorseScore,
+    )
+  })
+
+  it('floor cutoff zeroes out darkHorse for below-threshold answers', () => {
+    const result = computeScores(category, responses, { exponent: 1, floor: 0.5 })
+    // Response 1 ([0,1,0]) is orthogonal to category → bullseye ~0 → below floor
+    expect(result.scores[1].darkHorseScore).toBe(0)
+    // Response 0 ([1,0,0]) has bullseye = 1.0 → above floor → unaffected
+    expect(result.scores[0].darkHorseScore).toBeGreaterThan(0)
+  })
+
+  it('explicit defaults produce identical results to no params', () => {
+    const noParams = computeScores(category, responses)
+    const explicitDefaults = computeScores(category, responses, { exponent: 1, floor: 0 })
+    for (let i = 0; i < noParams.scores.length; i++) {
+      expect(explicitDefaults.scores[i].darkHorseScore).toBeCloseTo(
+        noParams.scores[i].darkHorseScore,
+      )
+    }
+  })
 })

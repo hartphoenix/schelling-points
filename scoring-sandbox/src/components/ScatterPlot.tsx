@@ -9,7 +9,7 @@ import {
   LabelList,
   Cell,
 } from 'recharts'
-import type { PlayerResult, ScoringMode } from '../types'
+import type { ComputeResult, PlayerResult, ScoringMode } from '../types'
 
 const modeKey: Record<ScoringMode, keyof PlayerResult> = {
   schelling: 'schellingScore',
@@ -17,11 +17,19 @@ const modeKey: Record<ScoringMode, keyof PlayerResult> = {
   darkHorse: 'darkHorseScore',
 }
 
+const modeKeyB: Record<ScoringMode, keyof PlayerResult> = {
+  schelling: 'schellingScoreB',
+  bullseye: 'bullseyeScoreB',
+  darkHorse: 'darkHorseScoreB',
+}
+
 interface ScatterPlotProps {
   players: PlayerResult[]
   categoryPoint: { text: string; x: number; y: number }
   centroidPoint: { x: number; y: number }
   activeMode: ScoringMode
+  promptBData?: ComputeResult['promptB']
+  activePrompt: 'A' | 'B'
 }
 
 function truncate(text: string, max = 20) {
@@ -33,17 +41,25 @@ function scoreToSize(score: number): number {
   return 4 + score * 12
 }
 
-export default function ScatterPlot({ players, categoryPoint, centroidPoint, activeMode }: ScatterPlotProps) {
-  const key = modeKey[activeMode]
-  const responseData = players.map((p) => ({
-    x: p.x,
-    y: p.y,
-    label: truncate(p.text),
-    size: scoreToSize(p[key] as number),
-  }))
+export default function ScatterPlot({ players, categoryPoint, centroidPoint, activeMode, promptBData, activePrompt }: ScatterPlotProps) {
+  const useB = activePrompt === 'B' && !!promptBData
+  const key = useB ? modeKeyB[activeMode] : modeKey[activeMode]
 
-  const categoryData = [{ x: categoryPoint.x, y: categoryPoint.y, label: categoryPoint.text }]
-  const centroidData = [{ x: centroidPoint.x, y: centroidPoint.y, label: 'Centroid' }]
+  const responseData = players.map((p, i) => {
+    const coords = useB ? promptBData!.playerCoords[i] : { x: p.x, y: p.y }
+    return {
+      x: coords.x,
+      y: coords.y,
+      label: truncate(p.text),
+      size: scoreToSize((p[key] as number) ?? 0),
+    }
+  })
+
+  const activeCategoryPoint = useB ? promptBData!.categoryPoint : categoryPoint
+  const activeCentroidPoint = useB ? promptBData!.centroidPoint : centroidPoint
+
+  const categoryData = [{ x: activeCategoryPoint.x, y: activeCategoryPoint.y, label: activeCategoryPoint.text }]
+  const centroidData = [{ x: activeCentroidPoint.x, y: activeCentroidPoint.y, label: 'Centroid' }]
 
   return (
     <div>

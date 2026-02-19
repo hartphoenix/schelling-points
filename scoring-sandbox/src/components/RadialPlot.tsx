@@ -6,10 +6,17 @@ const modeKey: Record<ScoringMode, keyof PlayerResult> = {
   darkHorse: 'darkHorseScore',
 }
 
+const modeKeyB: Record<ScoringMode, keyof PlayerResult> = {
+  schelling: 'schellingScoreB',
+  bullseye: 'bullseyeScoreB',
+  darkHorse: 'darkHorseScoreB',
+}
+
 interface RadialPlotProps {
   players: PlayerResult[]
   activeMode: ScoringMode
   centroidScores: { schelling: number; bullseye: number; darkHorse: number }
+  centroidScoresB?: { schelling: number; bullseye: number; darkHorse: number }
 }
 
 function truncate(text: string, max = 20) {
@@ -20,10 +27,17 @@ const SIZE = 400
 const CENTER = SIZE / 2
 const RADIUS = SIZE / 2 - 40 // leave room for labels
 
-export default function RadialPlot({ players, activeMode, centroidScores }: RadialPlotProps) {
+export default function RadialPlot({ players, activeMode, centroidScores, centroidScoresB }: RadialPlotProps) {
   const key = modeKey[activeMode]
+  const keyB = modeKeyB[activeMode]
+  const isDual = players[0]?.schellingScoreB !== undefined
+
   const centroidScore = centroidScores[activeMode]
   const centroidRadius = (1 - centroidScore) * RADIUS
+
+  const centroidRadiusB = centroidScoresB
+    ? (1 - centroidScoresB[activeMode]) * RADIUS
+    : 0
 
   const gridLines = [0.25, 0.5, 0.75].map((frac) => frac * RADIUS)
 
@@ -46,7 +60,7 @@ export default function RadialPlot({ players, activeMode, centroidScores }: Radi
         {/* Outer boundary */}
         <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="none" stroke="#ccc" strokeWidth={1} />
 
-        {/* Centroid reference circle — green dashed */}
+        {/* Centroid reference circle — green dashed (A) */}
         <circle
           cx={CENTER}
           cy={CENTER}
@@ -57,6 +71,19 @@ export default function RadialPlot({ players, activeMode, centroidScores }: Radi
           strokeDasharray="6 3"
         />
 
+        {/* Centroid reference circle — orange dashed (B) */}
+        {centroidScoresB && (
+          <circle
+            cx={CENTER}
+            cy={CENTER}
+            r={centroidRadiusB}
+            fill="none"
+            stroke="#cc8833"
+            strokeWidth={1.5}
+            strokeDasharray="6 3"
+          />
+        )}
+
         {/* Response points */}
         {players.map((p, i) => {
           const score = p[key] as number
@@ -65,14 +92,23 @@ export default function RadialPlot({ players, activeMode, centroidScores }: Radi
           const x = CENTER + dist * Math.cos(angle)
           const y = CENTER + dist * Math.sin(angle)
 
-          // Place label slightly further out
-          const labelDist = dist + 14
+          // B dot (same angle, different distance)
+          const scoreB = isDual ? (p[keyB] as number) : undefined
+          const distB = scoreB !== undefined ? (1 - scoreB) * RADIUS : 0
+          const xB = CENTER + distB * Math.cos(angle)
+          const yB = CENTER + distB * Math.sin(angle)
+
+          // Place label slightly further out from the furthest dot
+          const labelDist = Math.max(dist, isDual ? distB : 0) + 14
           const lx = CENTER + labelDist * Math.cos(angle)
           const ly = CENTER + labelDist * Math.sin(angle)
 
           return (
             <g key={p.index}>
               <circle cx={x} cy={y} r={5} fill="#4466cc" />
+              {isDual && scoreB !== undefined && (
+                <circle cx={xB} cy={yB} r={5} fill="#cc8833" />
+              )}
               <text
                 x={lx}
                 y={ly}
@@ -92,11 +128,27 @@ export default function RadialPlot({ players, activeMode, centroidScores }: Radi
       </svg>
 
       <div style={{ fontSize: 11, color: '#666', marginTop: 4 }}>
-        <span style={{ color: '#4466cc' }}>● Responses</span>
-        {' · '}
-        <span style={{ color: '#22883e' }}>- - Centroid</span>
-        {' · '}
-        <span>Center = score 1.0, edge = score 0.0</span>
+        {isDual ? (
+          <>
+            <span style={{ color: '#4466cc' }}>● Responses (A)</span>
+            {' · '}
+            <span style={{ color: '#cc8833' }}>● Responses (B)</span>
+            {' · '}
+            <span style={{ color: '#22883e' }}>- - Centroid (A)</span>
+            {' · '}
+            <span style={{ color: '#cc8833' }}>- - Centroid (B)</span>
+            {' · '}
+            <span>Center = 1.0, edge = 0.0</span>
+          </>
+        ) : (
+          <>
+            <span style={{ color: '#4466cc' }}>● Responses</span>
+            {' · '}
+            <span style={{ color: '#22883e' }}>- - Centroid</span>
+            {' · '}
+            <span>Center = score 1.0, edge = score 0.0</span>
+          </>
+        )}
       </div>
     </div>
   )
