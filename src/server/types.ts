@@ -12,6 +12,12 @@ export interface PlayerInfo {
     currentGuess?: string,
 }
 
+export interface Category {
+    id: number
+    prompt: string
+    difficulty: 'easy' | 'medium' | 'hard'
+}
+
 export type Phase =
     | { type: 'LOBBY', secsLeft?: number, isReady: Set<t.PlayerId>, }
     | { type: 'GUESSES', round: number, category: string, secsLeft: number, guesses: Map<t.PlayerId, string> }
@@ -57,11 +63,13 @@ export class State {
     nameChooser: names.Chooser
     lounge: Map<t.PlayerId, LoungeInfo>
     games: Map<t.GameId, Game>
+    categories: Category[]
 
-    constructor(nameChooser: names.Chooser) {
+    constructor(nameChooser: names.Chooser, categories: Category[]) {
         this.nameChooser = nameChooser
         this.lounge = new Map
         this.games = new Map
+        this.categories = categories
     }
 
     broadcastToLounge(message: t.ToClientMessage) {
