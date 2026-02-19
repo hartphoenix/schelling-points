@@ -139,16 +139,6 @@ p {
     cursor: pointer;
 }
 
-.btn-qr {
-    cursor: pointer;
-    opacity: 0.8;
-    transition: opacity 0.3s ease;
-}
-
-.btn-qr:hover {
-    opacity: 1;
-}
-
 .screen-header h1{
     font-family: var(--font-fancy);
     color: var(--cream);
