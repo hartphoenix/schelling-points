@@ -21,12 +21,13 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, otherPlaye
     mailbox.send({ type: 'LOBBY_READY', gameId, playerId, isReady: !currentlyReady })
   }
 
-  function qrCodeButton(url: string): JSX.Element {
+  function qrCodeButton(id: string): JSX.Element {
+    const gameUrl = `${window.location.origin}/game/${id}`
     return (<>
       <button popoverTarget="qr-popover">[QR code]</button>
       <div id="qr-popover" popover="auto">
         <QRCode
-          value={url}
+          value={gameUrl}
           size={180}
           qrStyle="dots"
           bgColor="transparent"
@@ -40,11 +41,12 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, otherPlaye
     </>)
   }
 
-  function copyUrlButton(url: string): JSX.Element {
-    navigator.clipboard.writeText(url)
+  function copyUrlButton(id: string): JSX.Element {
+    const gameUrl = `${window.location.origin}/game/${id}`
+    navigator.clipboard.writeText(gameUrl)
     return (<>
       <button popoverTarget="copy-popover">[copy URL]</button>
-      <div id="qr-popover" popover="auto">
+      <div id="copy-popover" popover="auto">
         copied!
       </div>
     </>)
@@ -65,7 +67,8 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, otherPlaye
       <button onClick={handleToggleReady}>
         {isReady.find(([id]) => id === playerId)?.[1] ? 'Unready' : 'Ready'}
       </button>
-      <copyUrlButton url={'game-URL'} />
+      {copyUrlButton(gameId)}
+      {qrCodeButton(gameId)}
     </div>
   )
 } 
