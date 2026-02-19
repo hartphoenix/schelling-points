@@ -1,5 +1,4 @@
 import express from 'express'
-import http from 'http'
 import * as api from './server/api'
 import * as names from './server/names'
 import * as play from './server/play'
@@ -43,5 +42,4 @@ api.addStatic(
 
 play.startTicking(state, 100)
 
-const webServer = http.createServer(app)
-webServer.listen(8000, '0.0.0.0')
+app.listen(8000, '0.0.0.0')

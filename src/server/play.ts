@@ -1,4 +1,4 @@
-import * as ws from 'ws'
+import WebSocket from 'ws'
 import * as config from '../config'
 import * as t from './types'
 import * as util from './util'
@@ -44,7 +44,7 @@ function pickCategory(round: number, categories: t.Category[]): string {
   return pick.prompt
 }
 
-function onTickGame(gameId: t.GameId, game: t.Game, timeSecs: number, deltaSecs: number, categories: t.Category[]) {
+export function onTickGame(gameId: t.GameId, game: t.Game, timeSecs: number, deltaSecs: number, categories: t.Category[]) {
   const phase = game.phase
   switch (phase.type) {
     case 'LOBBY': {
@@ -100,7 +100,7 @@ function onTickGame(gameId: t.GameId, game: t.Game, timeSecs: number, deltaSecs:
   }
 }
 
-export function onClientMessage(state: t.State, message: t.ToServerMessage, webSocket: ws.WebSocket) {
+export function onClientMessage(state: t.State, message: t.ToServerMessage, webSocket: WebSocket) {
   switch (message.type) {
     case 'JOIN_LOUNGE': {
       state.lounge.set(message.playerId, {
@@ -210,7 +210,7 @@ export function onClientMessage(state: t.State, message: t.ToServerMessage, webS
       game.broadcast(currentGameState(message.gameId, game))
 
       const livePlayerIds = game.players
-        .filter(info => info.webSocket.readyState === ws.WebSocket.OPEN)
+        .filter(info => info.webSocket.readyState === WebSocket.OPEN)
         .map(info => info.id)
       const allReady = livePlayerIds.length >= 2 && livePlayerIds.every(id => lobby.isReady.has(id))
       if (allReady) {
@@ -242,7 +242,7 @@ export function onClientMessage(state: t.State, message: t.ToServerMessage, webS
   }
 }
 
-function currentGameState(gameId: t.GameId, game: t.Game): t.ToClientMessage {
+export function currentGameState(gameId: t.GameId, game: t.Game): t.ToClientMessage {
   switch (game.phase.type) {
     case 'LOBBY': {
       const lobby = game.phase

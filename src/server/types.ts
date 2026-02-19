@@ -1,4 +1,4 @@
-import * as ws from 'ws'
+import WebSocket from 'ws'
 export * from '../types'
 import * as names from './names'
 import * as t from '../types'
@@ -7,7 +7,7 @@ export interface PlayerInfo {
   id: t.PlayerId,
   name: t.PlayerName,
   mood: t.Mood,
-  webSocket: ws.WebSocket,
+  webSocket: WebSocket,
   previousScoresAndGuesses: [number, string][],
   currentGuess?: string,
 }
@@ -38,7 +38,7 @@ export class Game {
     if (!player) {
       console.warn('unicast: player not found', playerId)
       return
-    } else if (player.webSocket.readyState !== ws.WebSocket.OPEN) {
+    } else if (player.webSocket.readyState !== WebSocket.OPEN) {
       console.warn('unicast: WebSocket not open', playerId)
       return
     }
@@ -64,7 +64,7 @@ export class Game {
 export interface LoungeInfo {
   name: t.PlayerName;
   mood: t.Mood;
-  webSocket: ws.WebSocket;
+  webSocket: WebSocket;
 }
 
 export class State {
@@ -82,7 +82,7 @@ export class State {
 
   broadcastToLounge(message: t.ToClientMessage) {
     for (let loungeInfo of this.lounge.values()) {
-      if (loungeInfo.webSocket.readyState !== ws.WebSocket.OPEN) {
+      if (loungeInfo.webSocket.readyState !== WebSocket.OPEN) {
         console.warn('broadcastToLounge: stale WebSocket, skipping')
         continue
       }
