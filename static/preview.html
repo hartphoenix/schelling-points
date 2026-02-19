@@ -11,6 +11,7 @@
         <title>Schelling Point Preview</title>
     </head>
     <body>
+        <!--LOUNGE Screen Preview-->
         <div class="screen">
             <div class="title-block">
                 <h1 class="title">The Schelling Point</h1>
@@ -21,14 +22,36 @@
                 <button class="btn">Create Game</button>   
                 <button class="btn">Join Game</button> 
             </div>
-        </div>   
+        </div>
+
+        <!--LOBBY Screen Preview-->
         <div class="screen">
             <div class="screen-topbar">
                 <button class="btn-back">‹</button>
             </div>
             <div class="screen-header">
                 <h1>Lobby</h1>
-                <h2>Your Game is <a href="#">placeholder-id</a></h2>
+                <h2>Your Game is 
+                    <a href="#">placeholder-id
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"         
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round"               
+                        stroke-linejoin="round">                                                    
+                        <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/>             
+                        <polyline points="16 6 12 2 8 6"/>                                
+                        <line x1="12" y1="2" x2="12" y2="15"/>
+                        </svg>
+                    </a>
+                    <svg class="btn-qr" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="2" y="2" width="8" height="8" rx="1"/>
+                        <rect x="14" y="2" width="8" height="8" rx="1"/>
+                        <rect x="2" y="14" width="8" height="8" rx="1"/>
+                        <rect x="14" y="14" width="4" height="4" rx="1"/>
+                        <line x1="22" y1="14" x2="22" y2="18"/>
+                        <line x1="18" y1="22" x2="22" y2="22"/>
+                    </svg>
+                </h2>
             </div>
             <div class="players-joined">
                 <div class="player-avatar" style="background: var(--pink);"></div>                  
@@ -60,7 +83,9 @@
             <div class="screen-footer">
                 <button class="btn">Ready Up</button>
             </div>
-        </div>   
+        </div>  
+        
+        <!--GUESS Screen Preview-->
         <div class="screen">
             <div class="screen-topbar">
                 <button class="btn-back">‹</button>
@@ -74,7 +99,27 @@
             <div class="screen-header">
                 <h2>Communicate Without Speaking</h2>
                 <h1>Round "#" of 10</h1>
-                <h2>Your Game is <a href="#">placeholder-id</a></h2>
+                <h2>Your Game is 
+                    <a href="#">placeholder-id
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"         
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round"               
+                        stroke-linejoin="round">                                                    
+                        <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/>             
+                        <polyline points="16 6 12 2 8 6"/>                                
+                        <line x1="12" y1="2" x2="12" y2="15"/>
+                        </svg>
+                    </a>
+                    <svg class="btn-qr" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="2" y="2" width="8" height="8" rx="1"/>
+                        <rect x="14" y="2" width="8" height="8" rx="1"/>
+                        <rect x="2" y="14" width="8" height="8" rx="1"/>
+                        <rect x="14" y="14" width="4" height="4" rx="1"/>
+                        <line x1="22" y1="14" x2="22" y2="18"/>
+                        <line x1="18" y1="22" x2="22" y2="22"/>
+                    </svg>
+                </h2>
             </div>
             <div class="category-display">
                 <h1>"Category"</h1>
@@ -108,6 +153,45 @@
                 <input class="input" placeholder="guess here..." />   
                 <button class="btn">Lock In</button> 
             </div>
-        </div>                              
+        </div>
+
+        <!--RESULTS Screen Preview-->
+        <div class="screen">
+            <div class="screen-topbar">
+                <button class="btn-back">‹</button>
+            </div>
+            <div class="screen-header">
+                <h2>Round "#" of 10</h2>
+                <h1>Results</h1>
+                <h2>Your Game is 
+                    <a href="#">placeholder-id
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"         
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round"               
+                        stroke-linejoin="round">                                                    
+                        <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/>             
+                        <polyline points="16 6 12 2 8 6"/>                                
+                        <line x1="12" y1="2" x2="12" y2="15"/>
+                        </svg>
+                    </a>
+                    <svg class="btn-qr" width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="2" y="2" width="8" height="8" rx="1"/>
+                        <rect x="14" y="2" width="8" height="8" rx="1"/>
+                        <rect x="2" y="14" width="8" height="8" rx="1"/>
+                        <rect x="14" y="14" width="4" height="4" rx="1"/>
+                        <line x1="22" y1="14" x2="22" y2="18"/>
+                        <line x1="18" y1="22" x2="22" y2="22"/>
+                    </svg>
+                </h2>
+            </div>
+            <div class="results-display">
+                <div class="results-visual"></div>
+            </div>
+            <div class="screen-footer">
+                <button class="btn">Next Round</button>
+            </div>
+        </div>
+        
     </body>
 </html>
