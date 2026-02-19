@@ -84,16 +84,7 @@ export function onTickGame(gameId: t.GameId, game: t.Game, timeSecs: number, del
       phase.secsLeft = Math.max(0, phase.secsLeft - deltaSecs)
       // TODO: need skip-ahead logic if all players are ready
       if (phase.secsLeft === 0) {
-        const round = phase.round + 1
-
-        if (round === config.ROUNDS_PER_GAME) {
-          game.phase = { type: 'LOBBY', secsLeft: undefined, isReady: new Set }
-        } else {
-          const category = pickCategory(round, categories)
-          game.phase = newGuessPhase(round, category)
-        }
-
-        game.broadcast(currentGameState(gameId, game))
+        goToNextRound(gameId, game, categories)
       }
       break
     }
@@ -205,7 +196,7 @@ export function onClientMessage(state: t.State, message: t.ToServerMessage, webS
     case 'LOBBY_READY': {
       const game = state.games.get(message.gameId)
       if (!game || game.phase.type !== 'LOBBY') {
-        console.warn('READY: game not found or not in LOBBY phase', message.gameId)
+        console.warn('LOBBY_READY: game not found or not in LOBBY phase', message.gameId)
         break
       }
 
@@ -227,11 +218,30 @@ export function onClientMessage(state: t.State, message: t.ToServerMessage, webS
         lobby.secsLeft = undefined
         game.broadcast(currentGameState(message.gameId, game))
       }
-
       break
     }
+
     case 'SCORES_READY': {
-      // TODO: similar to LOBBY_READY message flow
+      const game = state.games.get(message.gameId)
+      if (!game || game.phase.type !== 'SCORES') {
+        console.warn('SCORES_READY: game not found or not in SCORES phase', message.gameId)
+        break
+      }
+
+      const phase = game.phase
+
+      if (message.isReady) phase.isReady.add(message.playerId)
+      else phase.isReady.delete(message.playerId)
+
+      game.broadcast(currentGameState(message.gameId, game))
+
+      const livePlayerIds = game.players
+        .filter(info => info.webSocket.readyState === WebSocket.OPEN)
+        .map(info => info.id)
+      const allReady = 0 < livePlayerIds.length && livePlayerIds.every(id => phase.isReady.has(id))
+      if (allReady) {
+        goToNextRound(message.gameId, game, state.categories)
+      }
       break
     }
 
@@ -247,6 +257,23 @@ export function onClientMessage(state: t.State, message: t.ToServerMessage, webS
       break
     }
   }
+}
+
+function goToNextRound(gameId: t.GameId, game: t.Game, categories: t.Category[]) {
+  if (game.phase.type !== 'SCORES') {
+    return
+  }
+
+  const round = game.phase.round + 1
+
+  if (round === config.ROUNDS_PER_GAME) {
+    game.phase = { type: 'LOBBY', secsLeft: undefined, isReady: new Set }
+  } else {
+    const category = pickCategory(round, categories)
+    game.phase = newGuessPhase(round, category)
+  }
+
+  game.broadcast(currentGameState(gameId, game))
 }
 
 export function currentGameState(gameId: t.GameId, game: t.Game): t.ToClientMessage {
