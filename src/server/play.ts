@@ -23,7 +23,7 @@ export function startTicking(
 
 function onTick(state: t.State, timeSecs: number, deltaSecs: number) {
   for (let [gameId, game] of state.games) {
-    onTickGame(gameId, game, timeSecs, deltaSecs)
+    onTickGame(gameId, game, timeSecs, deltaSecs, state.categories)
   }
 }
 
@@ -37,7 +37,14 @@ function newGuessPhase(round: number, category: string): t.Phase {
   }
 }
 
-function onTickGame(gameId: t.GameId, game: t.Game, timeSecs: number, deltaSecs: number) {
+function pickCategory(round: number, categories: t.Category[]): string {
+  const difficulty = config.DIFFICULTY_SCHEDULE[round]
+  const matching = categories.filter(c => c.difficulty === difficulty)
+  const pick = matching[Math.floor(Math.random() * matching.length)]
+  return pick.prompt
+}
+
+function onTickGame(gameId: t.GameId, game: t.Game, timeSecs: number, deltaSecs: number, categories: t.Category[]) {
   const phase = game.phase
   switch (phase.type) {
     case 'LOBBY': {
@@ -46,8 +53,7 @@ function onTickGame(gameId: t.GameId, game: t.Game, timeSecs: number, deltaSecs:
       phase.secsLeft = Math.max(0, phase.secsLeft - deltaSecs)
 
       if (phase.secsLeft === 0) {
-        // TODO: Choose category
-        const category = 'animals'
+        const category = pickCategory(0, categories)
         game.phase = newGuessPhase(0, category)
         game.broadcast(currentGameState(gameId, game))
       }
@@ -83,8 +89,7 @@ function onTickGame(gameId: t.GameId, game: t.Game, timeSecs: number, deltaSecs:
         if (round === config.ROUNDS_PER_GAME) {
           game.phase = { type: 'LOBBY', secsLeft: undefined, isReady: new Set }
         } else {
-          // TODO: Choose category
-          const category = 'animals'
+          const category = pickCategory(round, categories)
           game.phase = newGuessPhase(round, category)
         }
 
