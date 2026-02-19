@@ -23,7 +23,7 @@ export function startTicking(
 
 function onTick(state: t.State, timeSecs: number, deltaSecs: number) {
   for (let [gameId, game] of state.games) {
-    onTickGame(gameId, game, timeSecs, deltaSecs)
+    onTickGame(gameId, game, timeSecs, deltaSecs, state.categories)
   }
 }
 
@@ -37,7 +37,14 @@ function newGuessPhase(round: number, category: string): t.Phase {
   }
 }
 
-export function onTickGame(gameId: t.GameId, game: t.Game, timeSecs: number, deltaSecs: number) {
+function pickCategory(round: number, categories: t.Category[]): string {
+  const difficulty = config.DIFFICULTY_SCHEDULE[round]
+  const matching = categories.filter(c => c.difficulty === difficulty)
+  const pick = matching[Math.floor(Math.random() * matching.length)]
+  return pick.prompt
+}
+
+export function onTickGame(gameId: t.GameId, game: t.Game, timeSecs: number, deltaSecs: number, categories: t.Category[]) {
   const phase = game.phase
   switch (phase.type) {
     case 'LOBBY': {
@@ -46,8 +53,7 @@ export function onTickGame(gameId: t.GameId, game: t.Game, timeSecs: number, del
       phase.secsLeft = Math.max(0, phase.secsLeft - deltaSecs)
 
       if (phase.secsLeft === 0) {
-        // TODO: Choose category
-        const category = 'animals'
+        const category = pickCategory(0, categories)
         game.phase = newGuessPhase(0, category)
         game.broadcast(currentGameState(gameId, game))
       }
@@ -66,6 +72,7 @@ export function onTickGame(gameId: t.GameId, game: t.Game, timeSecs: number, del
           round: phase.round,
           category: phase.category,
           secsLeft: config.SCORE_SECS,
+          isReady: new Set<string>(),
           scores,
         }
         game.broadcast(currentGameState(gameId, game))
@@ -75,15 +82,14 @@ export function onTickGame(gameId: t.GameId, game: t.Game, timeSecs: number, del
 
     case 'SCORES': {
       phase.secsLeft = Math.max(0, phase.secsLeft - deltaSecs)
-
+      // TODO: need skip-ahead logic if all players are ready
       if (phase.secsLeft === 0) {
         const round = phase.round + 1
 
         if (round === config.ROUNDS_PER_GAME) {
           game.phase = { type: 'LOBBY', secsLeft: undefined, isReady: new Set }
         } else {
-          // TODO: Choose category
-          const category = 'animals'
+          const category = pickCategory(round, categories)
           game.phase = newGuessPhase(round, category)
         }
 
@@ -189,7 +195,7 @@ export function onClientMessage(state: t.State, message: t.ToServerMessage, webS
       break
     }
 
-    case 'READY': {
+    case 'LOBBY_READY': {
       const game = state.games.get(message.gameId)
       if (!game || game.phase.type !== 'LOBBY') {
         console.warn('READY: game not found or not in LOBBY phase', message.gameId)
@@ -217,8 +223,13 @@ export function onClientMessage(state: t.State, message: t.ToServerMessage, webS
 
       break
     }
+    case 'SCORES_READY': {
+      // TODO: similar to LOBBY_READY message flow
+      break
+    }
 
     case 'GUESS': {
+      //TODO: if this is the final player to submit a guess, skip the clock & switch to scores
       const game = state.games.get(message.gameId)
       if (!game || game.phase.type !== 'GUESSES') {
         console.warn('GUESS: game not found or not in GUESSES phase', message.gameId)
@@ -264,6 +275,7 @@ export function currentGameState(gameId: t.GameId, game: t.Game): t.ToClientMess
         gameId,
         category: phase.category,
         playerScores: [...phase.scores.entries()],
+        isReady: game.players.map(info => [info.id, phase.isReady.has(info.id)]),
         secsLeft: phase.secsLeft,
       }
     }
