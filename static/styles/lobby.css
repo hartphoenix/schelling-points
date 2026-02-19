@@ -1,0 +1,42 @@
+.players-joined{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 18px;
+    padding: 22px;
+    border-radius: 20px;
+    border: 1px solid  rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.06); 
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.player-avatar{
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+}
+
+.avatar-picker{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width:90%;
+}
+
+.picker-arrow{
+    font-family: var(--font-body);
+    color: var(--cream);
+    background: none;
+    border: none;
+    font-size: 3rem;
+    font-weight: 200;
+    text-align: center;
+    cursor: pointer;
+}
+
+.avatar-selected{
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+}

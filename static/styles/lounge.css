@@ -1,0 +1,23 @@
+.title-block {
+    margin-top: 75%;
+}
+
+.title {
+    font-family: var(--font-fancy);
+    color: var(--cream);
+    text-align: center;
+    font-size: 3rem;
+    letter-spacing: 0.01em;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    font-family: var(--font-body);
+    color: rgba(255, 255, 255, 0.35);
+    text-align: center;
+    letter-spacing: .15em;
+    font-size: 0.85rem;
+    font-weight: 300;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+}
