@@ -1,7 +1,8 @@
-docs/
 dist/
 static/client.js
 node_modules
 scoring-sandbox/node_modules/
 scoring-sandbox/dist/
-.claude
+
+# Per-user Claude Code settings (permissions, machine-specific paths)
+.claude/settings.local.json
