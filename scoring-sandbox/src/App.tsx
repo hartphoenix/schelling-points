@@ -1,17 +1,25 @@
-import { useState, useCallback, useEffect } from 'react'
-import type { ScoringMode, ComputeStatus, ComputeResult, ViewMode } from './types'
+import { useState, useCallback, useEffect, useRef } from 'react'
+import type { ScoringMode, ComputeStatus, ComputeResult, PlayerResult, ViewMode } from './types'
 import { fetchEmbedding, checkOllamaStatus } from './lib/embeddings'
 import type { OllamaStatus } from './lib/embeddings'
 import { computeScores, cosineSimilarity } from './lib/scoring'
 import { projectTo2D } from './lib/projection'
 import InputPanel from './components/InputPanel'
 import ModeSelector from './components/ModeSelector'
+import TuningPanel from './components/TuningPanel'
 import ScoreTable from './components/ScoreTable'
 import ScatterPlot from './components/ScatterPlot'
 import RadialPlot from './components/RadialPlot'
 
+interface CachedEmbeddings {
+  category: number[]
+  responses: number[][]
+  categoryB?: number[]
+}
+
 export default function App() {
   const [category, setCategory] = useState('')
+  const [categoryB, setCategoryB] = useState('')
   const [responses, setResponses] = useState<string[]>(['', '', '', '', '', ''])
   const [activeMode, setActiveMode] = useState<ScoringMode>('schelling')
   const [status, setStatus] = useState<ComputeStatus>('idle')
@@ -19,6 +27,11 @@ export default function App() {
   const [result, setResult] = useState<ComputeResult | null>(null)
   const [ollamaStatus, setOllamaStatus] = useState<OllamaStatus>('checking')
   const [viewMode, setViewMode] = useState<ViewMode>('scatter')
+  const [darkHorseExponent, setDarkHorseExponent] = useState(1.0)
+  const [darkHorseFloor, setDarkHorseFloor] = useState(0.0)
+  const [activePrompt, setActivePrompt] = useState<'A' | 'B'>('A')
+
+  const embeddingsRef = useRef<CachedEmbeddings | null>(null)
 
   // Check ollama connection on mount
   useEffect(() => {
@@ -34,6 +47,16 @@ export default function App() {
     setResult(null)
     setStatus('idle')
     setError(null)
+    embeddingsRef.current = null
+  }, [])
+
+  const handleCategoryBChange = useCallback((value: string) => {
+    setCategoryB(value)
+    setResult(null)
+    setStatus('idle')
+    setError(null)
+    setActivePrompt('A')
+    embeddingsRef.current = null
   }, [])
 
   const handleResponsesChange = useCallback((next: string[]) => {
@@ -41,7 +64,49 @@ export default function App() {
     setResult(null)
     setStatus('idle')
     setError(null)
+    embeddingsRef.current = null
   }, [])
+
+  // Re-score using cached embeddings (pure math, <1ms, no fetch)
+  function reScore(exponent: number, floor: number) {
+    const cached = embeddingsRef.current
+    if (!cached || !result) return
+
+    const dhParams = { exponent, floor }
+    const { scores } = computeScores(cached.category, cached.responses, dhParams)
+
+    // Keep positions, update A scores only
+    const updatedPlayers: PlayerResult[] = result.players.map((p, i) => ({
+      ...p,
+      ...scores[i],
+    }))
+
+    // Re-score prompt B if cached
+    if (cached.categoryB && result.promptB) {
+      const { scores: scoresB } = computeScores(cached.categoryB, cached.responses, dhParams)
+      for (let i = 0; i < updatedPlayers.length; i++) {
+        updatedPlayers[i] = {
+          ...updatedPlayers[i],
+          schellingScoreB: scoresB[i].schellingScore,
+          bullseyeScoreB: scoresB[i].bullseyeScore,
+          darkHorseScoreB: scoresB[i].darkHorseScore,
+        }
+      }
+    }
+
+    // centroidScores unchanged — not affected by DH params
+    setResult({ ...result, players: updatedPlayers })
+  }
+
+  function handleExponentChange(n: number) {
+    setDarkHorseExponent(n)
+    reScore(n, darkHorseFloor)
+  }
+
+  function handleFloorChange(t: number) {
+    setDarkHorseFloor(t)
+    reScore(darkHorseExponent, t)
+  }
 
   async function handleCompute() {
     setStatus('loading')
@@ -50,16 +115,40 @@ export default function App() {
 
     try {
       const trimmedCategory = category.trim()
+      const trimmedCategoryB = categoryB.trim()
       const trimmedResponses = responses.filter((r) => r.trim()).map((r) => r.trim())
 
       // Fetch all embeddings in parallel
-      const [categoryEmbedding, ...responseEmbeddings] = await Promise.all([
+      const fetchPromises = [
         fetchEmbedding(trimmedCategory),
         ...trimmedResponses.map((r) => fetchEmbedding(r)),
-      ])
+      ]
+      if (trimmedCategoryB) {
+        fetchPromises.push(fetchEmbedding(trimmedCategoryB))
+      }
+      const allFetched = await Promise.all(fetchPromises)
 
-      // Compute scores — now returns centroid vector alongside per-response scores
-      const { scores, centroid: centroidVector } = computeScores(categoryEmbedding, responseEmbeddings)
+      const categoryEmbedding = allFetched[0]
+      const responseEmbeddings = allFetched.slice(1, 1 + trimmedResponses.length)
+      const categoryBEmbedding = trimmedCategoryB
+        ? allFetched[1 + trimmedResponses.length]
+        : undefined
+
+      // Cache embeddings for re-score on slider changes
+      embeddingsRef.current = {
+        category: categoryEmbedding,
+        responses: responseEmbeddings,
+        categoryB: categoryBEmbedding,
+      }
+
+      const dhParams = { exponent: darkHorseExponent, floor: darkHorseFloor }
+
+      // Compute prompt-A scores
+      const { scores, centroid: centroidVector } = computeScores(
+        categoryEmbedding,
+        responseEmbeddings,
+        dhParams,
+      )
 
       // Project to 2D (category + all responses), then centroid separately
       const allEmbeddings = [categoryEmbedding, ...responseEmbeddings]
@@ -74,8 +163,8 @@ export default function App() {
                    * (1 - cosineSimilarity(centroidVector, centroidVector)), // always 0.0
       }
 
-      // Build result
-      const players = trimmedResponses.map((text, i) => ({
+      // Build players
+      const players: PlayerResult[] = trimmedResponses.map((text, i) => ({
         index: i + 1,
         text,
         ...scores[i],
@@ -83,11 +172,54 @@ export default function App() {
         y: points[i + 1].y,
       }))
 
+      // Prompt B processing
+      let promptB: ComputeResult['promptB'] = undefined
+      if (categoryBEmbedding) {
+        const { scores: scoresB, centroid: centroidVectorB } = computeScores(
+          categoryBEmbedding,
+          responseEmbeddings,
+          dhParams,
+        )
+
+        // Separate PCA fit for B projection (category embedding shifts the axes)
+        const allEmbeddingsB = [categoryBEmbedding, ...responseEmbeddings]
+        const { points: pointsB, project: projectB } = projectTo2D(allEmbeddingsB)
+        const [centroidPointB] = projectB([centroidVectorB])
+
+        const centroidScoresB = {
+          schelling: cosineSimilarity(centroidVectorB, centroidVectorB),
+          bullseye: cosineSimilarity(centroidVectorB, categoryBEmbedding),
+          darkHorse: cosineSimilarity(centroidVectorB, categoryBEmbedding)
+                     * (1 - cosineSimilarity(centroidVectorB, centroidVectorB)),
+        }
+
+        // Merge B scores into players
+        for (let i = 0; i < players.length; i++) {
+          players[i] = {
+            ...players[i],
+            schellingScoreB: scoresB[i].schellingScore,
+            bullseyeScoreB: scoresB[i].bullseyeScore,
+            darkHorseScoreB: scoresB[i].darkHorseScore,
+          }
+        }
+
+        promptB = {
+          categoryPoint: { text: trimmedCategoryB, x: pointsB[0].x, y: pointsB[0].y },
+          centroidPoint: centroidPointB,
+          centroidScores: centroidScoresB,
+          playerCoords: trimmedResponses.map((_, i) => ({
+            x: pointsB[i + 1].x,
+            y: pointsB[i + 1].y,
+          })),
+        }
+      }
+
       setResult({
         players,
         categoryPoint: { text: trimmedCategory, x: points[0].x, y: points[0].y },
         centroidPoint,
         centroidScores,
+        promptB,
       })
       setStatus('success')
     } catch (err) {
@@ -122,6 +254,8 @@ export default function App() {
       <InputPanel
         category={category}
         onCategoryChange={handleCategoryChange}
+        categoryB={categoryB}
+        onCategoryBChange={handleCategoryBChange}
         responses={responses}
         onResponsesChange={handleResponsesChange}
         onCompute={handleCompute}
@@ -138,6 +272,13 @@ export default function App() {
           <hr style={{ margin: '1.5rem 0' }} />
 
           <ModeSelector activeMode={activeMode} onModeChange={setActiveMode} />
+
+          <TuningPanel
+            exponent={darkHorseExponent}
+            onExponentChange={handleExponentChange}
+            floor={darkHorseFloor}
+            onFloorChange={handleFloorChange}
+          />
 
           <div style={{ display: 'flex', gap: '2rem', marginTop: '1rem', flexWrap: 'wrap' }}>
             <div style={{ flex: '1 1 400px' }}>
@@ -158,18 +299,38 @@ export default function App() {
                   </label>
                 ))}
               </div>
+              {/* A/B prompt toggle — only when dual prompt and scatter view */}
+              {result.promptB && viewMode === 'scatter' && (
+                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: 8 }}>
+                  {(['A', 'B'] as const).map((p) => (
+                    <label key={p} style={{ cursor: 'pointer', fontSize: 13 }}>
+                      <input
+                        type="radio"
+                        name="activePrompt"
+                        value={p}
+                        checked={activePrompt === p}
+                        onChange={() => setActivePrompt(p)}
+                      />{' '}
+                      Prompt {p}
+                    </label>
+                  ))}
+                </div>
+              )}
               {viewMode === 'scatter' ? (
                 <ScatterPlot
                   players={result.players}
                   categoryPoint={result.categoryPoint}
                   centroidPoint={result.centroidPoint}
                   activeMode={activeMode}
+                  promptBData={result.promptB}
+                  activePrompt={activePrompt}
                 />
               ) : (
                 <RadialPlot
                   players={result.players}
                   activeMode={activeMode}
                   centroidScores={result.centroidScores}
+                  centroidScoresB={result.promptB?.centroidScores}
                 />
               )}
             </div>
