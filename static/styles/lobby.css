@@ -40,3 +40,30 @@
     height: 120px;
     border-radius: 50%;
 }
+
+.btn-qr {
+    background: none;
+    color: inherit;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+.qr-icon {
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+    background-color: transparent;
+}
+
+.qr-icon:hover {
+    opacity: 1;
+}
+
+#qr-popover {
+    padding: 20px; 
+    border-radius: 12px;
+    border: 1px solid  rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.06); 
+    backdrop-filter: blur(12px);
+    color: var(--cream);
+}
