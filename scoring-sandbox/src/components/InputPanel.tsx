@@ -1,6 +1,8 @@
 interface InputPanelProps {
   category: string
   onCategoryChange: (value: string) => void
+  categoryB: string
+  onCategoryBChange: (value: string) => void
   responses: string[]
   onResponsesChange: (responses: string[]) => void
   onCompute: () => void
@@ -11,6 +13,8 @@ interface InputPanelProps {
 export default function InputPanel({
   category,
   onCategoryChange,
+  categoryB,
+  onCategoryBChange,
   responses,
   onResponsesChange,
   onCompute,
@@ -47,6 +51,19 @@ export default function InputPanel({
             value={category}
             onChange={(e) => onCategoryChange(e.target.value)}
             placeholder='e.g. "animals"'
+            style={{ marginLeft: 8, padding: '4px 8px', width: 300 }}
+          />
+        </label>
+      </div>
+
+      <div style={{ marginBottom: '1rem' }}>
+        <label>
+          Compare with:
+          <input
+            type="text"
+            value={categoryB}
+            onChange={(e) => onCategoryBChange(e.target.value)}
+            placeholder='e.g. "a specific type of animal" (optional)'
             style={{ marginLeft: 8, padding: '4px 8px', width: 300 }}
           />
         </label>
