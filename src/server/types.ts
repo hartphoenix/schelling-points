@@ -32,6 +32,11 @@ export class Game {
   players: PlayerInfo[] = []
   phase: Phase = { type: 'LOBBY', isReady: new Set() }
   previousScores: RoundScore[] = []
+  categoryQueues: Record<'easy' | 'medium' | 'hard', number[]> = {
+    easy: [],
+    medium: [],
+    hard: [],
+  }
 
   unicast(playerId: t.PlayerId, message: t.ToClientMessage) {
     const player = this.players.find(info => info.id === playerId)
