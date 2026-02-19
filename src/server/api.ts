@@ -19,9 +19,20 @@ export function addWebsockets(state: t.State, app: express.Application) {
         console.warn('Rejected message: playerId mismatch', { expected: boundId, got: message.playerId })
         return
       }
+
       play.onClientMessage(state, message, webSocket)
     })
-    webSocket.on('close', () => socketOwner.delete(webSocket))
+
+    webSocket.on('close', () => {
+      const boundId = socketOwner.get(webSocket)
+      if (boundId !== undefined) {
+        if (state.lounge.has(boundId)) {
+          state.lounge.delete(boundId)
+          state.broadcastLoungeChange()
+        }
+        socketOwner.delete(webSocket)
+      }
+    })
   })
 }
 
