@@ -18,13 +18,7 @@ export function MoodPicker({ currentMood, onSelect }: Props) {
 
     return (
         <div className="mood-picker">
-            <button
-                className="mood-current"
-                onClick={() => setIsOpen(!isOpen)}
-            >
-                {currentMood}
-            </button>
-            {isOpen && (
+            {isOpen ? (
                 <div className="mood-options">
                     {ALL_MOODS.map(mood => (
                         <button
@@ -36,7 +30,14 @@ export function MoodPicker({ currentMood, onSelect }: Props) {
                         </button>
                     ))}
                 </div>
-            )}    
+            ) : (
+                <button
+                    className="mood-current"
+                    onClick={() => setIsOpen(true)}
+                >
+                    {currentMood}
+                </button>
+            )}
         </div>
     )
 }
