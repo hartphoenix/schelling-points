@@ -120,13 +120,11 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, mood, play
         )}
       </div>
       {secsLeft !== undefined
-        && <p>Starting in {Timer({ secsLeft })}...</p>}
-      <div className="screen-footer">
-        <button className="btn" onClick={handleToggleReady}>
         && <p>Starting in <Timer secsLeft={secsLeft} />...</p>}
-      <MoodPicker currentMood={currentMood} onSelect={handleMoodChange} />
-      <button onClick={handleToggleReady}>
-        {isReady.find(([id]) => id === playerId)?.[1] ? 'Unready' : 'Ready'}
+      <div className="screen-footer">
+        <MoodPicker currentMood={currentMood} onSelect={handleMoodChange} />
+        <button className="btn" onClick={handleToggleReady}>
+          {isReady.find(([id]) => id === playerId)?.[1] ? 'Unready' : 'Ready'}
         </button>
       </div>
     </div>
