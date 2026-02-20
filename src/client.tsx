@@ -104,18 +104,22 @@ function App({ gameId }: Props) {
 
   if (gameId && !playerName) {
     return (
-      <div className="lounge">
-        <h1>What's your name?</h1>
-        <input
-          type="text"
-          placeholder="Your name"
-          value={nameInput}
-          autoFocus
-          onChange={e => setNameInput(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && handleNameSubmit()}
-        />
-        <MoodPicker currentMood={currentMood} onSelect={setCurrentMood} />
-        <button onClick={handleNameSubmit}>Join Game</button>
+      <div className="screen lounge">
+        <div className="title-block">
+          <h1 className="title">The Schelling Point</h1>
+          <p className="subtitle">Do you & your friends think alike?</p>
+        </div>
+        <div className="screen-footer">
+          <input className="input"
+            type="text"
+            placeholder="Your name"
+            value={nameInput}
+            autoFocus
+            onChange={e => setNameInput(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleNameSubmit()}
+          />
+          <button className="btn" onClick={handleNameSubmit}>Join Lobby</button>
+        </div>
       </div>
     )
   }
