@@ -22,9 +22,9 @@ Pre-work checks before beginning any task.
 If GitHub is unreachable, warn and continue from local branch state.
 If there are no items in "Ready" or "Backlog", say so — don't treat it as an error.
 
-### 2. Identify the Task
+### 2. Rank & Screen
 
-If an issue number was provided, fetch it directly (skip prioritization).
+If an issue number was provided, fetch it directly (skip to step 4).
 
 Otherwise, rank all "Ready" and "Backlog" items using the following
 priority order. "Ready" items should generally surface above "Backlog"
@@ -44,45 +44,40 @@ also rank well in lower tiers.
    the product needs to function (core game loop, essential UI flows,
    shared infrastructure) rank above nice-to-have improvements.
 
-Present the top candidates as an ordered recommendation, noting why
-each ranks where it does. Let the user choose.
+After ranking, screen each candidate for issues that the user should
+know about before choosing:
 
-### 3. Check Blocking Conditions
+- **Duplicates** — search open PRs and in-progress board items for
+  overlapping scope. Flag any items that already have work in flight.
+- **Blockers** — check for unresolved blocking conditions (see
+  definitions below). Flag but don't hide blocked items.
 
-Review the task for blockers (see definitions below). If blocked,
-surface the reason and ask whether to proceed anyway or pick a
-different task.
+### 3. Present the Task
 
-### 4. Check for Duplicates
+Show the top candidates as an ordered recommendation. For each item,
+note why it ranks where it does and any flags from screening
+(duplicate work, blockers). Let the user choose.
 
-Search open PRs and in-progress board items for overlapping scope.
-Warn if found.
+### 4. Validate Selection
 
-### 5. Check WIP Limit
+After the user picks a task, run these checks on the selected item:
 
-Count "In Progress" items for the assignee. If at or above their
-WIP limit (from CLAUDE.md team table), warn and ask for confirmation.
+- **Blocking conditions** — if blocked, surface the specific reason
+  and ask whether to proceed anyway or pick a different task.
+- **WIP limit** — count "In Progress" items for the assignee. If at
+  or above their limit (from CLAUDE.md team table), warn and ask for
+  confirmation.
 
-### 6. Move to "In Progress"
+### 5. Move to "In Progress"
 
 Update the board item status.
 
-### 7. Set Up the Branch
+### 6. Set Up the Branch
 
 Create or checkout the feature branch using the
 `<person>/<short-description>` convention.
 
-### 8. Summary
+### 7. Summary
 
 Print what's being worked on, the branch name, and any warnings
 surfaced above.
-
-## Blocking Conditions
-
-Five categories checked during the environment and task checks:
-
-- **dependency** — upstream issue still open
-- **conflict** — another PR or in-progress task touches the same files
-- **decision** — unresolved `human-decision` issue
-- **review** — upstream PR not yet merged
-- **external** — outside the team's control
