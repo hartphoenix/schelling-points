@@ -45,6 +45,7 @@ export function Lounge({ mailbox, playerId, mood, otherPlayers }: Props) {
           <input className="input"
             type="text"
             placeholder="Your name"
+            maxLength={20}
             value={playerName}
             onChange={e => setPlayerName(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleJoin()}
