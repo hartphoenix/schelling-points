@@ -11,6 +11,7 @@ import '../static/styles/lounge.css'
 import '../static/styles/lobby.css'                                           
 import '../static/styles/guess.css'                                           
 
+import { MoodPicker } from './client/MoodPicker'
 
 const router = Router.createBrowserRouter([
   {
@@ -63,6 +64,16 @@ export interface Props {
 }
 function App({ gameId }: Props) {
   let [state, dispatch] = React.useReducer(onMessage, t.initialState())
+  const [playerName, setPlayerName] = React.useState(state.playerName)
+  const [nameInput, setNameInput] = React.useState('')
+  const [currentMood, setCurrentMood] = React.useState(state.mood)
+
+  function handleNameSubmit() {
+    const trimmed = nameInput.trim()
+    if (!trimmed) return
+    localStorage.setItem('playerName', trimmed)
+    setPlayerName(trimmed)
+  }
 
   React.useEffect(() => {
     state.mailbox.listen(dispatch)
@@ -78,15 +89,34 @@ function App({ gameId }: Props) {
 
   React.useEffect(() => {
     if (!gameId) return
+    if (!playerName) return
 
     state.mailbox.send({
       type: 'SUBSCRIBE_GAME',
       gameId,
       playerId: state.playerId,
-      playerName: state.playerName,
-      mood: state.mood,
+      playerName: playerName,
+      mood: currentMood,
     })
-  }, [gameId])
+  }, [gameId, playerName])
+
+  if (gameId && !playerName) {
+    return (
+      <div className="lounge">
+        <h1>What's your name?</h1>
+        <input
+          type="text"
+          placeholder="Your name"
+          value={nameInput}
+          autoFocus
+          onChange={e => setNameInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleNameSubmit()}
+        />
+        <MoodPicker currentMood={currentMood} onSelect={setCurrentMood} />
+        <button onClick={handleNameSubmit}>Join Game</button>
+      </div>
+    )
+  }
 
   switch (state.view.type) {
     case 'LOUNGE':
@@ -104,6 +134,8 @@ function App({ gameId }: Props) {
         gameId={state.view.gameId}
         isReady={state.view.isReady}
         secsLeft={state.view.secsLeft}
+        mood={state.mood}
+        playerName={state.playerName}
         otherPlayers={state.otherPlayers}
       />
 
