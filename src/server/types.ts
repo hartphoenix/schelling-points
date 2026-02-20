@@ -21,7 +21,7 @@ export interface Category {
 export type Phase =
   | { type: 'LOBBY', secsLeft?: number, isReady: Set<t.PlayerId>, }
   | { type: 'GUESSES', round: number, category: string, secsLeft: number, guesses: Map<t.PlayerId, string> }
-  | { type: 'SCORES', round: number, category: string, isReady: Set<t.PlayerId>, secsLeft: number, scores: Map<t.PlayerId, number> }
+  | { type: 'SCORES', round: number, category: string, isReady: Set<t.PlayerId>, secsLeft: number, scores: Map<t.PlayerId, number>, positions: Map<t.PlayerId, [number, number]>, guesses: Map<t.PlayerId, string> }
 
 export interface RoundScore {
   category: string;
@@ -32,6 +32,7 @@ export class Game {
   players: PlayerInfo[] = []
   phase: Phase = { type: 'LOBBY', isReady: new Set() }
   previousScores: RoundScore[] = []
+  scoringInProgress = false
   categoryQueues: Record<'easy' | 'medium' | 'hard', number[]> = {
     easy: [],
     medium: [],

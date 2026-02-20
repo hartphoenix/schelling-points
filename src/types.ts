@@ -18,7 +18,7 @@ export type ToClientMessage =
   | { type: 'LOBBY_STATE', gameId: GameId, isReady: [PlayerId, boolean][] }
   | { type: 'LOBBY_COUNTDOWN', gameId: GameId, secsLeft: number }
   | { type: 'GUESS_STATE', gameId: GameId, category: string, hasGuessed: [PlayerId, boolean][], secsLeft: number }
-  | { type: 'SCORE_STATE', gameId: GameId, category: string, playerScores: [PlayerId, number][], isReady: [PlayerId, boolean][], secsLeft: number }
+  | { type: 'SCORE_STATE', gameId: GameId, category: string, playerScores: [PlayerId, number][], positions: [PlayerId, number, number][], isReady: [PlayerId, boolean][], secsLeft: number, guesses: [PlayerId, string][] }
   | { type: 'NO_SUCH_GAME', gameId: GameId }
 
 export type Response =

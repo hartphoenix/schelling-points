@@ -46,7 +46,7 @@ function onMessage(state: t.State, message: t.ToClientMessage): t.State {
       return { ...state, view: { type: 'GUESSES', gameId: message.gameId, hasGuessed: message.hasGuessed, category: message.category, secsLeft: message.secsLeft } }
 
     case 'SCORE_STATE':
-      return { ...state, view: { type: 'SCORES', gameId: message.gameId, scores: message.playerScores, category: message.category, isReady: message.isReady, secsLeft: message.secsLeft } }
+      return { ...state, view: { type: 'SCORES', gameId: message.gameId, scores: message.playerScores, positions: message.positions, category: message.category, isReady: message.isReady, secsLeft: message.secsLeft, guesses: message.guesses } }
 
     case 'LOBBY_COUNTDOWN': {
       const isReady = state.view.type === 'LOBBY' ? state.view.isReady : []
@@ -155,10 +155,12 @@ function App({ gameId }: Props) {
         playerId={state.playerId}
         mailbox={state.mailbox}
         scores={state.view.scores}
+        positions={state.view.positions}
         category={state.view.category}
         otherPlayers={state.otherPlayers}
         isReady={state.view.isReady}
         secsLeft={state.view.secsLeft}
+        guesses={state.view.guesses}
       />
 
     // minimal error boundary in case extra views added later
