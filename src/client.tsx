@@ -6,6 +6,7 @@ import { Guesses } from "./client/Guesses"
 import { Lounge } from "./client/Lounge"
 import { Lobby } from "./client/Lobby"
 import { Scores } from "./client/Scores"
+import { MoodPicker } from './client/MoodPicker'
 
 const router = Router.createBrowserRouter([
   {
@@ -58,6 +59,16 @@ export interface Props {
 }
 function App({ gameId }: Props) {
   let [state, dispatch] = React.useReducer(onMessage, t.initialState())
+  const [playerName, setPlayerName] = React.useState(state.playerName)
+  const [nameInput, setNameInput] = React.useState('')
+  const [currentMood, setCurrentMood] = React.useState(state.mood)
+
+  function handleNameSubmit() {
+    const trimmed = nameInput.trim()
+    if (!trimmed) return
+    localStorage.setItem('playerName', trimmed)
+    setPlayerName(trimmed)
+  }
 
   React.useEffect(() => {
     state.mailbox.listen(dispatch)
@@ -73,15 +84,34 @@ function App({ gameId }: Props) {
 
   React.useEffect(() => {
     if (!gameId) return
+    if (!playerName) return
 
     state.mailbox.send({
       type: 'SUBSCRIBE_GAME',
       gameId,
       playerId: state.playerId,
-      playerName: state.playerName,
-      mood: state.mood,
+      playerName: playerName,
+      mood: currentMood,
     })
-  }, [gameId])
+  }, [gameId, playerName])
+
+  if (gameId && !playerName) {
+    return (
+      <div className="lounge">
+        <h1>What's your name?</h1>
+        <input
+          type="text"
+          placeholder="Your name"
+          value={nameInput}
+          autoFocus
+          onChange={e => setNameInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleNameSubmit()}
+        />
+        <MoodPicker currentMood={currentMood} onSelect={setCurrentMood} />
+        <button onClick={handleNameSubmit}>Join Game</button>
+      </div>
+    )
+  }
 
   switch (state.view.type) {
     case 'LOUNGE':
