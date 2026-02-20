@@ -1,6 +1,5 @@
 import * as t from './types'
 import * as React from 'react'
-import * as config from '../config'
 import { Timer } from './components/timer'
 
 type Props = {
@@ -13,21 +12,19 @@ type Props = {
   otherPlayers: [t.PlayerId, t.PlayerName, t.Mood][]
   isReady: [string, boolean][]
   secsLeft: number | undefined
-  round?: number
+  round: number
+  totalRounds: number
   guesses?: [t.PlayerId, string][]
 }
 
 function RoundTopbar({ round, totalRounds, secsLeft }: {
-  round?: number
+  round: number
   totalRounds: number
   secsLeft?: number
 }) {
   return (
     <div className="screen-topbar">
-      {round !== undefined
-        ? <span>Round {round + 1} of {totalRounds}</span>
-        : <span />
-      }
+      <span>Round {round + 1} of {totalRounds}</span>
       {secsLeft !== undefined
         ? <span><Timer secsLeft={secsLeft} />s</span>
         : <span />
@@ -119,7 +116,7 @@ function GameOverFooter({ standings }: {
   )
 }
 
-export function Scores({ gameId, playerId, mailbox, scores, category, otherPlayers, isReady, secsLeft, round, guesses }: Props) {
+export function Scores({ gameId, playerId, mailbox, scores, category, otherPlayers, isReady, secsLeft, round, totalRounds, guesses }: Props) {
   const nameOf = new Map(otherPlayers.map(([id, name]) => [id, name]))
 
   //My data
@@ -141,7 +138,7 @@ export function Scores({ gameId, playerId, mailbox, scores, category, otherPlaye
 
   // Final standings for game-over
   // TODO: needs culumative scores, not just this round
-  const isGameOver = round !== undefined && round + 1 >= config.ROUNDS_PER_GAME
+  const isGameOver = round + 1 >= totalRounds
   const standings = allResults.map(r => ({ name: r.name, score: r.score }))
 
   const handleToggleReady = () => {
@@ -153,7 +150,7 @@ export function Scores({ gameId, playerId, mailbox, scores, category, otherPlaye
 
   return (
     <div className="screen">
-      <RoundTopbar round={round} totalRounds={config.ROUNDS_PER_GAME} secsLeft={secsLeft} />
+      <RoundTopbar round={round} totalRounds={totalRounds} secsLeft={secsLeft} />
       <CategoryHeader category={category} />
       <div className="visualization-placeholder" />
       <MyResult guess={myGuess} score={myScore} />

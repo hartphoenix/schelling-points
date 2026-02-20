@@ -17,8 +17,8 @@ export type ToClientMessage =
   | { type: 'MEMBER_CHANGE', gameId?: GameId, allPlayers: [PlayerId, PlayerName, Mood][] }
   | { type: 'LOBBY_STATE', gameId: GameId, isReady: [PlayerId, boolean][] }
   | { type: 'LOBBY_COUNTDOWN', gameId: GameId, secsLeft: number }
-  | { type: 'GUESS_STATE', gameId: GameId, category: string, hasGuessed: [PlayerId, boolean][], secsLeft: number }
-  | { type: 'SCORE_STATE', gameId: GameId, category: string, playerScores: [PlayerId, number][], positions: [PlayerId, number, number][], guesses: [PlayerId, string][], isReady: [PlayerId, boolean][], secsLeft: number }
+  | { type: 'GUESS_STATE', gameId: GameId, category: string, hasGuessed: [PlayerId, boolean][], secsLeft: number, round: number, totalRounds: number }
+  | { type: 'SCORE_STATE', gameId: GameId, category: string, playerScores: [PlayerId, number][], positions: [PlayerId, number, number][], guesses: [PlayerId, string][], isReady: [PlayerId, boolean][], secsLeft: number, round: number, totalRounds: number }
   | { type: 'NO_SUCH_GAME', gameId: GameId }
 
 export type Response =

@@ -382,7 +382,9 @@ export function currentGameState(gameId: t.GameId, game: t.Game): t.ToClientMess
         gameId,
         category: phase.category,
         hasGuessed: game.players.map(info => [info.id, phase.guesses.has(info.id)]),
-        secsLeft: phase.secsLeft
+        secsLeft: phase.secsLeft,
+        round: phase.round,
+        totalRounds: config.ROUNDS_PER_GAME,
       }
     }
     case 'SCORES': {
@@ -396,6 +398,8 @@ export function currentGameState(gameId: t.GameId, game: t.Game): t.ToClientMess
         guesses: [...phase.guesses.entries()],
         isReady: game.players.map(info => [info.id, phase.isReady.has(info.id)]),
         secsLeft: phase.secsLeft,
+        round: phase.round,
+        totalRounds: config.ROUNDS_PER_GAME,
       }
     }
   }
