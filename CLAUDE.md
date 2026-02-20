@@ -115,11 +115,16 @@ Add a `### Dependencies` section to the issue body:
 ```
 
 ### When creating issues
-Before creating a new issue, the agent should:
-1. Search open issues for overlapping scope (`gh issue list --search "<keywords>"`)
-2. If a dependency exists, add it to the Dependencies section
-3. If the dependency is unresolved, add the `blocked` label
-4. Link the issues bidirectionally (add a comment on the blocking issue too)
+Before creating a new issue, the agent must:
+1. Search ALL open issues (any status except Done) for overlapping scope
+   (`gh issue list --search "<keywords>"`)
+2. For each match, classify: **blocks**, **depends on**, or **duplicates**.
+   An implementation task that presupposes answers to an open
+   `human-decision` issue is a dependency.
+3. Add matches to a `### Dependencies` section in the new issue body
+4. Link bidirectionally (comment on the related issue too)
+5. If a blocking dependency is unresolved, add `blocked` label and do
+   NOT mark the new issue as "Ready"
 
 ### When closing issues
 After an issue closes, check for issues with `blocked` label that

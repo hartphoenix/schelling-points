@@ -49,6 +49,11 @@ know about before choosing:
 
 - **Duplicates** — search open PRs and in-progress board items for
   overlapping scope. Flag any items that already have work in flight.
+- **Scope conflicts** — for each candidate, check ALL non-Done issues
+  for overlapping domain. Flag when a candidate answers, implements,
+  or presupposes decisions from another open issue — especially when
+  an `agent-resolvable` task overlaps with an unresolved
+  `human-decision` or `architecture` issue.
 - **Blockers** — check for unresolved blocking conditions (see
   definitions below). Flag but don't hide blocked items.
 
