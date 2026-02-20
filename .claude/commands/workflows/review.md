@@ -114,7 +114,7 @@ For each finding from the review:
    relevant, append finding as comment on existing issue. If false
    positive, proceed to step 3.
 3. **No match + human-needed →** Create new GitHub issue using
-   Assignment Protocol in CLAUDE.md.
+   Assignment Protocol in `.claude/commands/workflows/triage.md`.
 4. **No match + agent-resolvable →** Create GitHub issue (labeled
    `agent-resolvable`) AND create lightweight working file:
 
