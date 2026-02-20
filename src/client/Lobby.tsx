@@ -74,7 +74,7 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, mood, play
         ))}
       </ul>
       {secsLeft !== undefined
-        && <p>Starting in {Timer({ secsLeft })}...</p>}
+        && <p>Starting in <Timer secsLeft={secsLeft} />...</p>}
       <MoodPicker currentMood={currentMood} onSelect={handleMoodChange} />
       <button onClick={handleToggleReady}>
         {isReady.find(([id]) => id === playerId)?.[1] ? 'Unready' : 'Ready'}
