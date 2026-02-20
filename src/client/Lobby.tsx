@@ -78,9 +78,8 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, mood, play
 
   function copyUrlButton(id: string): JSX.Element {
     const gameUrl = `${window.location.origin}/game/${id}`
-    navigator.clipboard.writeText(gameUrl)
     return (<>
-      <button className="btn-icon" popoverTarget="copy-popover">
+      <button className="btn-icon" popoverTarget="copy-popover" onClick={() => navigator.clipboard.writeText(gameUrl)}>
         <svg className="icon" width="18" height="18" viewBox="0 0 24 24" fill="none"         
           stroke="currentColor" strokeWidth="2" strokeLinecap="round"               
           strokeLinejoin="round">                                                    
