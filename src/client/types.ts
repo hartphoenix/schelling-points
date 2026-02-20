@@ -35,6 +35,6 @@ export function initialState(): State {
     otherPlayers: [],
     playerId,
     playerName,
-    mood: '😀'
+    mood: (localStorage.getItem('mood') as t.Mood) ?? '😀'
   }
 }

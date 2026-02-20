@@ -30,6 +30,7 @@ export function Lounge({ mailbox, playerId, mood, otherPlayers }: Props) {
 
   function handleMoodChange(newMood: t.Mood) {
     setCurrentMood(newMood)
+    localStorage.setItem('mood', newMood)
     if (joined) {
       mailbox.send({ type: 'SET_PLAYER_INFO', playerId, playerName, mood: newMood })
     }
