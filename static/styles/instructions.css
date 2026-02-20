@@ -1,0 +1,78 @@
+#instructions-popover {
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: var(--cream);
+    margin: auto;
+    max-width: 340px;
+    text-align: center;
+}
+
+.instructions-title {
+    font-family: var(--font-fancy);
+    color: var(--cream);
+    font-size: 1.5rem;
+    letter-spacing: 0.01em;
+    margin-bottom: 12px;
+}
+
+/* Intentional departures from global p:
+   - text-transform: none (sentences, not labels)
+   - letter-spacing: 0.02em (wide tracking hurts sentence readability)
+   - color: rgba(255,255,255, 0.6) (primary content, not caption) */
+.instructions-body {
+    font-family: var(--font-body);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    font-weight: 300;
+    line-height: 1.5;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    margin-bottom: 16px;
+}
+
+.instructions-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.instructions-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: background 0.3s ease;
+}
+
+.instructions-dot.active {
+    background: var(--cream);
+}
+
+.instructions-nav {
+    display: flex;
+    justify-content: space-between;
+}
+
+.instructions-prev,
+.instructions-next {
+    font-family: var(--font-body);
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: .15em;
+    font-size: 0.75rem;
+    font-weight: 300;
+    text-transform: uppercase;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+    cursor: pointer;
+}
+
+.instructions-prev:hover,
+.instructions-next:hover {
+    opacity: 1;
+}

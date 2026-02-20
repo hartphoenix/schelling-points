@@ -5,6 +5,7 @@ import type { JSX } from 'react'
 import { QRCode } from 'react-qrcode-logo'
 import { Timer } from './components/timer'
 import { MoodPicker } from './MoodPicker'
+import { InstructionsPopover } from './InstructionsPopover'
 
 type Props = {
   mailbox: Box
@@ -98,7 +99,7 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, mood, play
     <div className="screen lobby">
       <div className="screen-topbar">
         <button className="btn-back">‹</button>
-        {/*add leave function for btn-back and instructions popover button*/}
+        <InstructionsPopover />
       </div>
       <div className="screen-header">
         <h1>Lobby</h1>
