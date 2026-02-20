@@ -7,6 +7,10 @@ import { Lounge } from "./client/Lounge"
 import { Lobby } from "./client/Lobby"
 import { Scores } from "./client/Scores"
 import { MoodPicker } from './client/MoodPicker'
+import '../static/styles/global.css'
+import '../static/styles/lounge.css'
+import '../static/styles/lobby.css'
+import '../static/styles/guess.css'
 
 const router = Router.createBrowserRouter([
   {
