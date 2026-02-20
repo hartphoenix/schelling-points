@@ -102,7 +102,7 @@ WIP limits).
 ## Triage & Assignment
 
 After `/workflows:review`, classify findings and assign issues using
-`.claude/commands/workflows/triage-todos.md`.
+`.claude/commands/workflows/triage.md`.
 
 ## Dependency Protocol
 

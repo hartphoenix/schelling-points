@@ -127,7 +127,7 @@ For each finding from the review:
    lifecycle, no status field. Delete after agent completes work.
 
 Decision criteria for agent-resolvable vs. human-needed: see
-`.claude/commands/workflows/triage-todos.md`.
+`.claude/commands/workflows/triage.md`.
 
 ### 7. Summary Report
 
