@@ -1,0 +1,69 @@
+/* ── MoodPicker ── */
+
+.mood-picker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 4px;
+}
+
+.mood-current {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border: none;
+    background: none;
+    font-size: 2rem;
+    line-height: 1;
+    padding: 0;
+    cursor: pointer;
+}
+
+.mood-label {
+    font-family: var(--font-body);
+    color: rgba(255, 255, 255, 0.3);
+    text-transform: uppercase;
+    letter-spacing: .15em;
+    font-size: 0.6rem;
+    font-weight: 300;
+}
+
+.mood-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100%;
+}
+
+.mood-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: none;
+    font-size: 2rem;
+    line-height: 1;
+    padding: 0;
+    cursor: pointer;
+}
+
+/* ── Avatar mood badge ── */
+
+.avatar-mood {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    font-size: 1.05rem;
+}
+
+.avatar-selected + .avatar-mood {
+    bottom: -2px;
+    right: -2px;
+    font-size: 1.5rem;
+}

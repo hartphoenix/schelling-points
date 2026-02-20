@@ -28,12 +28,6 @@
     text-transform: uppercase;
 }
 
-.avatar-mood{
-    position: absolute;
-    bottom: -4px;
-    right: -4px;
-    font-size: 1.25rem;
-}
 .avatar-picker{
     display: flex;
     justify-content: center;
