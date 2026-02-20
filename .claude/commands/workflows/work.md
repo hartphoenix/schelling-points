@@ -33,8 +33,8 @@ This command takes a work document (plan, specification, or todo file) and execu
    First, read the base branch from config and check the current branch:
 
    ```bash
-   # Read base branch from compound-engineering.local.md frontmatter
-   base_branch=$(grep '^base_branch:' compound-engineering.local.md 2>/dev/null | sed 's/base_branch: *//')
+   # Read base branch from .claude/compound-engineering.md frontmatter
+   base_branch=$(grep '^base_branch:' .claude/compound-engineering.md 2>/dev/null | sed 's/base_branch: *//')
    if [ -z "$base_branch" ]; then
      base_branch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
    fi
@@ -45,10 +45,12 @@ This command takes a work document (plan, specification, or todo file) and execu
    current_branch=$(git branch --show-current)
    ```
 
-   **Then, check for an existing feature branch related to this plan.** Derive an expected branch name from the plan title (e.g., a plan titled "feat: Slop Tycoon MVP" → `feat/slop-tycoon-mvp`). Check if that branch already exists locally:
+   **Then, check for an existing feature branch related to this plan.** Branch
+   convention is `<person>/<short-description>` (see CLAUDE.md team table for
+   person names). Check if a branch matching this plan already exists locally:
 
    ```bash
-   git branch --list "feat/*" --list "fix/*"
+   git branch --list "*/*"
    ```
 
    **If a matching feature branch exists** (from a previous work pass on the same plan):
@@ -66,9 +68,9 @@ This command takes a work document (plan, specification, or todo file) and execu
    **Create a new branch**
    ```bash
    git pull origin [base_branch]
-   git checkout -b feature-branch-name
+   git checkout -b <person>/<short-description>
    ```
-   Use a meaningful name based on the work (e.g., `feat/slop-tycoon-mvp`, `fix/email-validation`).
+   Use the `<person>/<short-description>` convention from CLAUDE.md (e.g., `hart/lobby-onboarding`, `ulysse/scoring-algorithm`).
 
    **Continue on the base branch** (requires explicit user confirmation)
    - Only proceed after user explicitly says "yes, commit to `[base_branch]`"
@@ -164,7 +166,7 @@ This command takes a work document (plan, specification, or todo file) and execu
 
 2. **Consider Reviewer Agents** (Optional)
 
-   Use for complex, risky, or large changes. Read agents from `compound-engineering.md` frontmatter (`review_agents`).
+   Use for complex, risky, or large changes. Read agents from `.claude/compound-engineering.md` frontmatter (`review_agents`).
 
    Run configured agents in parallel with Task tool. Present findings and address critical issues.
 
@@ -180,7 +182,8 @@ This command takes a work document (plan, specification, or todo file) and execu
 1. **Create Commit**
 
    ```bash
-   git add .
+   # Stage specific files related to this work (not git add .)
+   git add <files related to this feature>
    git status  # Review what's being committed
    git diff --staged  # Check the changes
 
@@ -200,13 +203,15 @@ This command takes a work document (plan, specification, or todo file) and execu
    Use the base branch from config (read in Phase 1 step 2) as the PR target:
 
    ```bash
-   git push -u origin feature-branch-name
+   git push -u origin <person>/<short-description>
 
-   gh pr create --base [base_branch] --title "Feature: [Description]" --body "$(cat <<'EOF'
+   gh pr create --base [base_branch] --title "<type>: [Description]" --body "$(cat <<'EOF'
    ## Summary
-   - What was built
+   - What changed
    - Why it was needed
    - Key decisions made
+
+   Closes #N
 
    ## Testing
    - Tests added/modified
@@ -215,7 +220,20 @@ This command takes a work document (plan, specification, or todo file) and execu
    )"
    ```
 
-3. **Resource Cleanup**
+   Include `Closes #N` (or `Fixes #N` for bugs) so issues auto-close on merge,
+   per CLAUDE.md PR conventions.
+
+3. **Blocked-Issue Cleanup**
+
+   After PR creation, check if any issues with the `blocked` label depended
+   on the work just completed. If all their dependencies are now resolved,
+   remove the `blocked` label and move to "Ready" on the project board.
+
+   ```bash
+   gh issue list --label blocked --state open --json number,title,body
+   ```
+
+4. **Resource Cleanup**
 
    After PR creation, clean up ephemeral working docs:
 

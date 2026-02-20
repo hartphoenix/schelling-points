@@ -46,9 +46,9 @@ The following paths are pipeline artifacts and must never be flagged for deletio
 
 #### Load Review Agents
 
-Read `compound-engineering.md` in the project root. Use `review_agents` from YAML frontmatter. If the markdown body contains review context, pass it to each agent as additional instructions.
+Read `.claude/compound-engineering.md`. Use `review_agents` from YAML frontmatter. If the markdown body contains review context, pass it to each agent as additional instructions.
 
-#### Parallel Agents to review the PR:
+### 2. Parallel Agent Analysis
 
 <parallel_tasks>
 
@@ -60,12 +60,17 @@ Task {agent-name}(PR content + review context from settings body)
 
 Additionally, always run these regardless of settings:
 - Task learnings-researcher(PR content) - Search docs/solutions/ for past issues related to this PR's modules and patterns
-- Task feature-ui-completeness(PR content + changed files) - Phase 5 audit (see instructions below)
-- Task decision-balance-audit(PR content + changed files) - Phase 6 audit (see instructions below)
+- Task feature-ui-completeness(PR content + changed files) - audit (see Phase 5 below)
+- Task decision-balance-audit(PR content + changed files) - audit (see Phase 6 below)
 
 </parallel_tasks>
 
-### 4. Deep Dive Phases
+**Verify completeness:** After all agents return, check that each returned
+a non-empty result. If any agent returned empty or errored, note which
+analysis is missing in the findings synthesis (e.g., "Learnings check
+unavailable — agent returned empty").
+
+### 3. Deep Dive Phases
 
 #### Phase 3: Stakeholder Perspective Analysis
 
@@ -98,6 +103,7 @@ Run the Task code-simplicity-reviewer() to see if we can simplify the code.
 ### 5. Findings Synthesis
 
 - [ ] Collect findings from all parallel agents
+- [ ] Note any agents that returned empty or errored — flag as "Analysis unavailable" in the report
 - [ ] Surface learnings-researcher results: if past solutions are relevant, flag them as "Known Pattern" with links to docs/solutions/ files
 - [ ] Discard any findings that recommend deleting files in `docs/plans/` or `docs/solutions/`
 - [ ] Categorize by type: security, performance, architecture, quality, etc.
