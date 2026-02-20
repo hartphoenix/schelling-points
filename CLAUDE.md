@@ -48,6 +48,10 @@ Keep messages short and meaningful. Commit working states frequently.
 - **CSS-only or content-only PRs** may self-merge
 - Hart merges to main (integrator role)
 - Delete branch after merge
+- **Link issues in PR body.** Use `Closes #N` (or `Fixes #N` for bugs)
+  so the issue auto-closes on merge. Multiple issues: `Closes #N, closes #M`.
+- **PR description required.** Every PR body must include: what changed,
+  why, and which issue(s) it addresses. One-liner is fine for small PRs.
 
 ### Labels
 Apply at least one type label and one triage label to every issue:
