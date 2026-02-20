@@ -201,7 +201,6 @@ export function onClientMessage(state: t.State, message: t.ToServerMessage, webS
         mood: loungeInfo.mood,
         webSocket,
         previousScoresAndGuesses: [],
-        currentGuess: undefined,
       })
       newGame.broadcast(currentGameState(gameId, newGame))
 
@@ -233,7 +232,6 @@ export function onClientMessage(state: t.State, message: t.ToServerMessage, webS
           mood: state.lounge.get(message.playerId)?.mood || '😀',
           webSocket,
           previousScoresAndGuesses: [],
-          currentGuess: undefined,
         })
       }
 
@@ -363,9 +361,9 @@ export function currentGameState(gameId: t.GameId, game: t.Game): t.ToClientMess
         category: phase.category,
         playerScores: [...phase.scores.entries()],
         positions: [...phase.positions.entries()].map(([id, [x, y]]) => [id, x, y] as [t.PlayerId, number, number]),
+        guesses: [...phase.guesses.entries()],
         isReady: game.players.map(info => [info.id, phase.isReady.has(info.id)]),
         secsLeft: phase.secsLeft,
-        guesses: [...phase.guesses.entries()],
       }
     }
   }

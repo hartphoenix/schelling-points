@@ -9,7 +9,6 @@ export interface PlayerInfo {
   mood: t.Mood,
   webSocket: WebSocket,
   previousScoresAndGuesses: [number, string][],
-  currentGuess?: string,
 }
 
 export interface Category {

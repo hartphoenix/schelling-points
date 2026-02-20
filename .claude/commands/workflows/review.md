@@ -95,11 +95,7 @@ Run as a Task subagent with the diff/file list. Read agent instructions from `.c
 
 Run the Task code-simplicity-reviewer() to see if we can simplify the code.
 
-### 5. Findings Synthesis and Todo Creation Using file-todos Skill
-
-<critical_requirement> ALL findings MUST be stored in the .claude/todos/ directory using the file-todos skill. Create todo files immediately after synthesis. </critical_requirement>
-
-#### Step 1: Synthesize All Findings
+### 5. Findings Synthesis
 
 - [ ] Collect findings from all parallel agents
 - [ ] Surface learnings-researcher results: if past solutions are relevant, flag them as "Known Pattern" with links to docs/solutions/ files
@@ -109,62 +105,33 @@ Run the Task code-simplicity-reviewer() to see if we can simplify the code.
 - [ ] Remove duplicate or overlapping findings
 - [ ] Estimate effort for each finding (Small/Medium/Large)
 
-#### Step 2: Create Todo Files Using file-todos Skill
+### 6. Triage & Issue Routing
 
-Use the file-todos skill to create todo files for ALL findings immediately.
+For each finding from the review:
 
-- Create todo files directly using Write tool
-- Use standard template from `.claude/skills/file-todos/assets/todo-template.md`
-- Follow naming convention: `{issue_id}-pending-{priority}-{description}.md`
+1. **Search existing issues** — `gh issue list --search "<finding keywords>"`
+2. **Match found →** Present match with one-line rationale. If confirmed
+   relevant, append finding as comment on existing issue. If false
+   positive, proceed to step 3.
+3. **No match + human-needed →** Create new GitHub issue using
+   Assignment Protocol in `.claude/commands/workflows/triage.md`.
+4. **No match + agent-resolvable →** Create GitHub issue (labeled
+   `agent-resolvable`) AND create lightweight working file:
 
-**Examples:**
-```
-001-pending-p1-path-traversal-vulnerability.md
-002-pending-p1-api-response-validation.md
-003-pending-p2-concurrency-limit.md
-004-pending-p3-unused-parameter.md
-```
+   ```
+   mkdir -p .claude/todos/agent
+   ```
 
-#### Step 3: Triage — Classify Ownership
+   File: `.claude/todos/agent/<issue-number>-<short-description>.md`
+   Contents: description, file location, acceptance criteria. No YAML
+   lifecycle, no status field. Delete after agent completes work.
 
-<critical_requirement> After todos are created, spawn a fresh triage agent to classify every finding by ownership. Do NOT skip this step. </critical_requirement>
+Decision criteria for agent-resolvable vs. human-needed: see
+`.claude/commands/workflows/triage.md`.
 
-Spawn a Task agent with the following prompt:
+### 7. Summary Report
 
-> Read all todo files in `.claude/todos/`. Read the team roster and assignment
-> protocol from `CLAUDE.md`. For each finding, classify it:
->
-> **Agent-resolvable** (all must be true):
-> - One correct answer derivable from code context, language rules, or repo conventions
-> - No product behavior, UX flow, or architecture shape is being decided
-> - A wrong fix would be an obvious bug, not a defensible design choice
->
-> **Human-needed** (any is true):
-> - Fix requires choosing between multiple legitimate options
-> - Decision affects user-facing behavior or product feel
-> - "Right" answer depends on intent the codebase doesn't encode
-> - Finding involves removing/keeping code whose purpose is unclear
->
-> Create `.claude/todos/agent/README.md` listing agent-resolvable items with status.
-> Create `.claude/todos/user/README.md` listing human-needed items linked to GitHub issues.
->
-> For each human-needed item, file a GitHub issue (if one doesn't already exist)
-> and add it to the project board. Use `gh issue create` and `gh project item-add`.
-
-The triage agent produces two directories:
-
-```
-.claude/todos/
-├── agent/    # Agent works these autonomously via /workflows:work
-└── user/     # Human reviews these; linked to GitHub issues
-```
-
-See `.claude/commands/workflows/triage-todos.md` for decision
-criteria details and examples.
-
-#### Step 4: Summary Report
-
-After triage completes, present comprehensive summary:
+Present comprehensive summary:
 
 ```markdown
 ## Code Review Complete
@@ -179,11 +146,8 @@ After triage completes, present comprehensive summary:
 - **NICE-TO-HAVE (P3):** [count] - Enhancements
 
 ### Triage:
-- **Agent-resolvable:** [count] → `todos/agent/`
-- **Human-needed:** [count] → `todos/user/` (GitHub issues filed)
-
-### Created Todo Files:
-[list all created todo files]
+- **Agent-resolvable:** [count] → GitHub issues + `.claude/todos/agent/`
+- **Human-needed:** [count] → GitHub issues
 
 ### Next Steps:
 1. Address P1 Findings (CRITICAL - must be fixed before merge)
