@@ -46,10 +46,10 @@ function onMessage(state: t.State, message: t.ToClientMessage): t.State {
       return { ...state, view: { type: 'LOBBY', gameId: message.gameId, isReady: message.isReady } }
 
     case 'GUESS_STATE':
-      return { ...state, view: { type: 'GUESSES', gameId: message.gameId, hasGuessed: message.hasGuessed, category: message.category, secsLeft: message.secsLeft } }
+      return { ...state, view: { type: 'GUESSES', gameId: message.gameId, hasGuessed: message.hasGuessed, category: message.category, secsLeft: message.secsLeft, round: message.round, totalRounds: message.totalRounds } }
 
     case 'SCORE_STATE':
-      return { ...state, view: { type: 'SCORES', gameId: message.gameId, scores: message.playerScores, positions: message.positions, guesses: message.guesses, category: message.category, isReady: message.isReady, secsLeft: message.secsLeft } }
+      return { ...state, view: { type: 'SCORES', gameId: message.gameId, scores: message.playerScores, positions: message.positions, guesses: message.guesses, category: message.category, isReady: message.isReady, secsLeft: message.secsLeft, round: message.round, totalRounds: message.totalRounds } }
 
     case 'LOBBY_COUNTDOWN': {
       const isReady = state.view.type === 'LOBBY' ? state.view.isReady : []
@@ -155,6 +155,8 @@ function App({ gameId }: Props) {
         category={state.view.category}
         secsLeft={state.view.secsLeft}
         hasGuessed={state.view.hasGuessed}
+        round={state.view.round}
+        totalRounds={state.view.totalRounds}
       />
 
     case 'SCORES':
@@ -169,6 +171,8 @@ function App({ gameId }: Props) {
         otherPlayers={state.otherPlayers}
         isReady={state.view.isReady}
         secsLeft={state.view.secsLeft}
+        round={state.view.round}
+        totalRounds={state.view.totalRounds}
       />
 
     // minimal error boundary in case extra views added later

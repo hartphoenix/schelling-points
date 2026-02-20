@@ -6,8 +6,8 @@ import * as t from '../types'
 export type View =
   | { type: 'LOUNGE' }
   | { type: 'LOBBY', gameId: string, isReady: [t.PlayerId, boolean][], secsLeft?: number }
-  | { type: 'GUESSES', gameId: string, hasGuessed: [t.PlayerId, boolean][], category: string, secsLeft: number, guess?: string }
-  | { type: 'SCORES', gameId: string, isReady: [t.PlayerId, boolean][], secsLeft?: number, scores: [t.PlayerId, number][], positions?: [t.PlayerId, number, number][], guesses: [t.PlayerId, string][], category: string }
+  | { type: 'GUESSES', gameId: string, hasGuessed: [t.PlayerId, boolean][], category: string, secsLeft: number, guess?: string, round: number, totalRounds: number }
+  | { type: 'SCORES', gameId: string, isReady: [t.PlayerId, boolean][], secsLeft?: number, scores: [t.PlayerId, number][], positions?: [t.PlayerId, number, number][], guesses: [t.PlayerId, string][], category: string, round: number, totalRounds: number }
 
 export type State = {
   audioPlayer: audio.Player,
