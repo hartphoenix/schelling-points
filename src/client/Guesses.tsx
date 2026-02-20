@@ -15,8 +15,20 @@ const colors = [
     '--purple', '--purple-light',
   ]
 
-function GuessInput(props: { onSubmit: (guess: string) => void }) {
+function GuessInput(props: { onSubmit: (guess: string) => void, locked: boolean }) {
   const [guess, setGuess] = React.useState('')
+
+  function handleLockIn() {
+    if (guess) props.onSubmit(guess)
+  }
+
+  if (props.locked) {
+    return (
+      <div className="screen-footer locked-in">
+        <p className="locked-in-msg">Locked in!</p>
+      </div>
+    )
+  }
 
   return (
     <div className="screen-footer">
@@ -26,8 +38,9 @@ function GuessInput(props: { onSubmit: (guess: string) => void }) {
         type="text"
         value={guess}
         onChange={(e) => setGuess(e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && handleLockIn()}
       />
-      <button className="btn" onClick={() => guess && props.onSubmit(guess)}>
+      <button className="btn" onClick={handleLockIn}>
         Lock In
       </button>
     </div>
@@ -96,7 +109,7 @@ export function Guesses({ mailbox, playerId, gameId, category, secsLeft, hasGues
       </div>
       <div className="screen-footer">
         <PlayerProgress hasGuessed={hasGuessed} />
-        <GuessInput onSubmit={handleSubmit} />
+        <GuessInput onSubmit={handleSubmit} locked={hasGuessed.some(([id, done]) => id === playerId && done)} />
       </div>
     </div>
   )
