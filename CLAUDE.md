@@ -125,6 +125,8 @@ Before creating a new issue, the agent must:
 4. Link bidirectionally (comment on the related issue too)
 5. If a blocking dependency is unresolved, add `blocked` label and do
    NOT mark the new issue as "Ready"
+6. Add the issue to the project board
+   (`gh project item-add 1 --owner thrialectics --url <issue-url>`)
 
 ### When closing issues
 After an issue closes, check for issues with `blocked` label that
