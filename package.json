@@ -7,7 +7,9 @@
     "dev:server": "tsx --watch src/server.ts",
     "dev:client": "vite",
     "build": "vite build",
-    "start": "tsx src/server.ts"
+    "start": "tsx src/server.ts",
+    "setup-ollama": "bash scripts/setup-ollama.sh",
+    "postinstall": "bash scripts/setup-ollama.sh"
   },
   "dependencies": {
     "howler": "^2.2.4",
