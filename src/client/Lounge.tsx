@@ -3,6 +3,7 @@ import * as t from './types'
 import { Box } from './mail'
 import { MoodPicker } from './MoodPicker'
 import { InstructionsPopover } from './InstructionsPopover'
+import { playerColor } from './playerColor'
 
 type Props = {
   mailbox: Box
@@ -77,7 +78,7 @@ export function Lounge({ mailbox, playerId, mood, otherPlayers }: Props) {
       
       <div className="screen-footer">
         <div className="avatar-wrapper">
-          <div className="avatar-selected" style={{background: 'var(--cream)'}}>
+          <div className="avatar-selected" style={{background: `var(${playerColor(playerId).primary})`}}>
             {playerName.charAt(0)}
           </div>
           <span className="avatar-mood">{currentMood}</span>
