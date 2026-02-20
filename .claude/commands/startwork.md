@@ -1,38 +1,68 @@
 # Start Work
 
-Run the start-work gate before beginning any task.
+Pre-work checks before beginning any task.
 
 ## Usage
-`/startwork` — pick from the current user's assigned items
+`/startwork` — pick from assigned items on the board
 `/startwork #<issue-number>` — start a specific issue
 
 ## Protocol
 
-1. **Identify the task.** If an issue number was provided, fetch it.
-   Otherwise, query the board for the current user's assigned items
-   in "Ready" and present them for selection.
+### 1. Environment Check
 
-2. **Check blocking conditions.**
-   - **dependency** — upstream issue still open
-   - **conflict** — another PR or in-progress task touches the same files
-   - **decision** — unresolved `human-decision` issue
-   - **review** — upstream PR not yet merged
-   - **external** — outside the team's control
+1. Pull latest main (`git pull origin main`)
+2. Query the project board for assigned items in "Ready"
+   (`gh project item-list 1 --owner thrialectics --format json`)
+3. Check blocked items for resolved conditions (see Blocking
+   Conditions below)
+4. Scan `.claude/todos/agent/` for stale working files (created >24h
+   ago) and surface them for verification
+5. Surface a brief summary before proceeding
 
-   If blocked, surface the reason and ask whether to proceed anyway
-   or pick a different task.
+If GitHub is unreachable, warn and continue from local branch state.
+If there are no assigned items, say so — don't treat it as an error.
 
-3. **Check for duplicates.** Search open PRs and in-progress board
-   items for overlapping scope. Warn if found.
+### 2. Identify the Task
 
-4. **Check WIP limit.** Count the current user's "In Progress" items.
-   If at or above their WIP limit (from CLAUDE.md team table), warn
-   and ask for confirmation.
+If an issue number was provided, fetch it. Otherwise, present the
+assigned "Ready" items for selection.
 
-5. **Move to "In Progress."** Update the board item status.
+### 3. Check Blocking Conditions
 
-6. **Set up the branch.** Create or checkout the feature branch
-   using the `<person>/<short-description>` convention.
+Review the task for blockers (see definitions below). If blocked,
+surface the reason and ask whether to proceed anyway or pick a
+different task.
 
-7. **Summary.** Print what the current user is working on, the branch
-   name, and any warnings surfaced above.
+### 4. Check for Duplicates
+
+Search open PRs and in-progress board items for overlapping scope.
+Warn if found.
+
+### 5. Check WIP Limit
+
+Count "In Progress" items for the assignee. If at or above their
+WIP limit (from CLAUDE.md team table), warn and ask for confirmation.
+
+### 6. Move to "In Progress"
+
+Update the board item status.
+
+### 7. Set Up the Branch
+
+Create or checkout the feature branch using the
+`<person>/<short-description>` convention.
+
+### 8. Summary
+
+Print what's being worked on, the branch name, and any warnings
+surfaced above.
+
+## Blocking Conditions
+
+Five categories checked during the environment and task checks:
+
+- **dependency** — upstream issue still open
+- **conflict** — another PR or in-progress task touches the same files
+- **decision** — unresolved `human-decision` issue
+- **review** — upstream PR not yet merged
+- **external** — outside the team's control

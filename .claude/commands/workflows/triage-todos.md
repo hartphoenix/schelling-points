@@ -55,7 +55,7 @@ For each finding:
 2. **Match found →** Confirm relevance, then append finding as comment
    on existing issue.
 3. **No match + human-needed →** Create new GitHub issue using
-   Assignment Protocol in CLAUDE.md.
+   the Assignment Protocol below.
 4. **No match + agent-resolvable →** Create GitHub issue (labeled
    `agent-resolvable`) AND create lightweight working file:
 
@@ -99,3 +99,21 @@ For each finding:
 - **Human reviews obvious bugs by hand.** That's what agent-resolvable items are for.
 - **Issues filed without triage.** Creates noise; triage first, then file.
 - **Issues filed without dedup.** Creates duplicates; search first, then file.
+
+## Assignment Protocol (for human-needed items)
+
+0. **Check for duplicates.** Run the Dedup Protocol above.
+1. **Match to role.** Use the Role → Task Mapping table in CLAUDE.md.
+2. **Check availability.** Query project board (`gh project item-list`).
+   Count items in "In Progress" per person.
+3. **Respect WIP limits.** If primary assignee is at their WIP limit,
+   assign to secondary. If both are at limit, add to Backlog unassigned.
+4. **Check dependencies.** Before assigning, search open issues for
+   related work. If a dependency exists, note it (see Dependency Protocol
+   in CLAUDE.md).
+5. **Create issue.** Use `gh issue create` with:
+   - Title: `<type>: <description>`
+   - Assignee: determined by steps 1–3
+   - Labels: `human-decision` + type label + priority
+   - Body: finding summary + proposed options + dependency notes
+6. **Add to project board.** Place in "Ready" column (or "Backlog" if blocked).

@@ -68,7 +68,7 @@ Columns: Backlog → Ready → In Progress → In Review → Done
 ## Workflow Protocol
 
 Use the `.claude/` workflows in this sequence. Every step concludes
-with the handoff-test skill (see Handoff Protocol below).
+with the `handoff-test` skill (`.claude/skills/handoff-test/SKILL.md`).
 
 1. **Explore** → `/workflows:brainstorm` → handoff-test → plan
 2. **Plan** → `/workflows:plan` → handoff-test → work
@@ -84,31 +84,11 @@ with the handoff-test skill (see Handoff Protocol below).
 - **PR ready or code complete** → start at step 4 (review)
 - **Just solved a tricky problem** → step 6 (compound)
 
-## Session Start
+## Start Work Reminder
 
-At the start of each session, Claude should:
-1. Pull latest main (`git pull origin main`)
-2. Query the board for the current user's assigned items
-   (`gh project item-list 1 --owner thrialectics --format json`)
-3. Check blocked items for resolved conditions (dependency, conflict,
-   decision, review, external)
-4. Scan `.claude/todos/agent/` for stale working files (created >24h ago)
-   and surface them for verification
-5. Surface a brief summary before proceeding
-
-If GitHub is unreachable, warn and continue from local branch state.
-If the current user has no assigned items, say so — don't treat it as an error.
-
-## Start Work Gate
-
-Before beginning work on any task, run `/startwork` (or follow its
-protocol manually). The command checks for blocking conditions,
-duplicates, and WIP limits, then moves the task to "In Progress."
-
-See `.claude/commands/startwork.md` for the full protocol.
-
-Agents should only work items from `.claude/todos/agent/` or
-explicitly assigned GitHub issues — never unassigned "Ready" items.
+Before editing code, remind the user to check the project board or
+run `/startwork` to automate pre-work checks (blockers, duplicates,
+WIP limits).
 
 ## Resource Lifecycle
 
@@ -119,59 +99,10 @@ explicitly assigned GitHub issues — never unassigned "Ready" items.
 | `docs/solutions/*.md` | Persistent | Never — institutional knowledge |
 | `.claude/todos/agent/*` | Ephemeral | Delete after agent completes work |
 
-## Handoff Protocol
-
-Every workflow step ends by running the `handoff-test` skill
-(`.claude/skills/handoff-test/SKILL.md`). The skill defines what it
-checks — read it when running the test.
-
-At the end of each step, run handoff-test and specify the receiving step:
-
-| Completing Step | Artifact | Hands Off To |
-|----------------|----------|-------------|
-| `/workflows:brainstorm` | `docs/brainstorms/*.md` | `/workflows:plan` |
-| `/workflows:plan` | `docs/plans/*.md` | `/workflows:work` |
-| `/workflows:work` | PR / branch + commit history | `/workflows:review` |
-| `/workflows:review` | Review findings + todos | Triage agent |
-| Triage | GitHub issues + `.claude/todos/agent/` | `/workflows:work` (agent) or team member (human) |
-| `/workflows:compound` | `docs/solutions/*.md` | Next session (any team member) |
-
-If the artifact fails, fix the gaps before completing the step.
-
 ## Triage & Assignment
 
-After `/workflows:review`, classify findings as agent-resolvable or
-human-needed using the pattern in
+After `/workflows:review`, classify findings and assign issues using
 `.claude/commands/workflows/triage-todos.md`.
-
-### Assignment protocol (for human-needed items)
-0. **Check for duplicates.** Search open issues for keyword overlap
-   before creating new ones. If a match is found, confirm relevance
-   before commenting. Merge findings into existing issues when overlap
-   is confirmed.
-1. **Match to role.** Use the Role → Task Mapping table above.
-2. **Check availability.** Query project board (`gh project item-list`).
-   Count items in "In Progress" per person.
-3. **Respect WIP limits.** If primary assignee is at their WIP limit,
-   assign to secondary. If both are at limit, add to Backlog unassigned.
-4. **Check dependencies.** Before assigning, search open issues for
-   related work. If a dependency exists, note it (see Dependency Protocol).
-5. **Create issue.** Use `gh issue create` with:
-   - Title: `<type>: <description>`
-   - Assignee: determined by steps 1–3
-   - Labels: `human-decision` + type label + priority
-   - Body: finding summary + proposed options + dependency notes
-6. **Add to project board.** Place in "Ready" column (or "Backlog" if blocked).
-
-### Blocking Conditions
-
-Five categories — used by Session Start and Start Work Gate:
-
-- **dependency** — upstream issue still open
-- **conflict** — another PR or in-progress task touches the same files
-- **decision** — unresolved `human-decision` issue
-- **review** — upstream PR not yet merged
-- **external** — outside the team's control
 
 ## Dependency Protocol
 
