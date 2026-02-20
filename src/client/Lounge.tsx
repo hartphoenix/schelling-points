@@ -2,6 +2,7 @@ import * as React from 'react'
 import * as t from './types'
 import { Box } from './mail'
 import { MoodPicker } from './MoodPicker'
+import { InstructionsPopover } from './InstructionsPopover'
 
 type Props = {
   mailbox: Box
@@ -37,9 +38,13 @@ export function Lounge({ mailbox, playerId, mood, otherPlayers }: Props) {
   if (!joined) {
     return (
       <div className="screen lounge">
+        <div className="screen-topbar">
+          <span />
+          <InstructionsPopover autoShow />
+        </div>
         <div className="title-block">
           <h1 className="title">The Schelling Point</h1>
-          <p className="subtitle">Do you & your friends think alike?</p> 
+          <p className="subtitle">Do you & your friends think alike?</p>
         </div>
         <div className="screen-footer">
           <input className="input"
@@ -58,10 +63,14 @@ export function Lounge({ mailbox, playerId, mood, otherPlayers }: Props) {
 
   return (
     <div className="screen lounge">
+      <div className="screen-topbar">
+        <span />
+        <InstructionsPopover />
+      </div>
       <div className="screen-header">
         <div className="title-block">
           <h1 className="title">Lounge</h1>
-          <p className="subtitle">Do you & your friends think alike?</p> 
+          <p className="subtitle">Do you & your friends think alike?</p>
         </div>
       </div>
       

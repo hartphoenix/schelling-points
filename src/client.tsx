@@ -12,6 +12,7 @@ import '../static/styles/lobby.css'
 import '../static/styles/guesses.css'    
 import '../static/styles/scores.css'
 import '../static/styles/mood-picker.css'
+import '../static/styles/instructions.css'
 
 import { MoodPicker } from './client/MoodPicker'
 
