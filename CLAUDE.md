@@ -68,7 +68,7 @@ Columns: Backlog → Ready → In Progress → In Review → Done
 ## Workflow Protocol
 
 Use the `.claude/` workflows in this sequence. Every step concludes
-with the handoff-test skill (see Handoff Protocol below).
+with the `handoff-test` skill (`.claude/skills/handoff-test/SKILL.md`).
 
 1. **Explore** → `/workflows:brainstorm` → handoff-test → plan
 2. **Plan** → `/workflows:plan` → handoff-test → work
@@ -84,45 +84,25 @@ with the handoff-test skill (see Handoff Protocol below).
 - **PR ready or code complete** → start at step 4 (review)
 - **Just solved a tricky problem** → step 6 (compound)
 
-## Handoff Protocol
+## Start Work Reminder
 
-Every workflow step ends by running the `handoff-test` skill
-(`.claude/skills/handoff-test/SKILL.md`). The skill defines what it
-checks — read it when running the test.
+Before editing code, remind the user to check the project board or
+run `/startwork` to automate pre-work checks (blockers, duplicates,
+WIP limits).
 
-At the end of each step, run handoff-test and specify the receiving step:
+## Resource Lifecycle
 
-| Completing Step | Artifact | Hands Off To |
-|----------------|----------|-------------|
-| `/workflows:brainstorm` | `docs/brainstorms/*.md` | `/workflows:plan` |
-| `/workflows:plan` | `docs/plans/*.md` | `/workflows:work` |
-| `/workflows:work` | PR / branch + commit history | `/workflows:review` |
-| `/workflows:review` | Review findings + todos | Triage agent |
-| Triage | GitHub issues + `.claude/todos/agent/`, `.claude/todos/user/` | `/workflows:work` (agent) or team member (human) |
-| `/workflows:compound` | `docs/solutions/*.md` | Next session (any team member) |
-
-If the artifact fails, fix the gaps before completing the step.
+| Artifact | Lifecycle | Cleanup Trigger |
+|----------|-----------|-----------------|
+| `docs/brainstorms/*.md` | Ephemeral | Delete after corresponding PR merges (if no other branches reference it) |
+| `docs/plans/*.md` | Ephemeral | Delete after corresponding PR merges (if no other branches reference it) |
+| `docs/solutions/*.md` | Persistent | Never — institutional knowledge |
+| `.claude/todos/agent/*` | Ephemeral | Delete after agent completes work |
 
 ## Triage & Assignment
 
-After `/workflows:review`, classify findings as agent-resolvable or
-human-needed using the pattern in
-`.claude/commands/workflows/triage-todos.md`.
-
-### Assignment protocol (for human-needed items)
-1. **Match to role.** Use the Role → Task Mapping table above.
-2. **Check availability.** Query project board (`gh project item-list`).
-   Count items in "In Progress" per person.
-3. **Respect WIP limits.** If primary assignee is at their WIP limit,
-   assign to secondary. If both are at limit, add to Backlog unassigned.
-4. **Check dependencies.** Before assigning, search open issues for
-   related work. If a dependency exists, note it (see Dependency Protocol).
-5. **Create issue.** Use `gh issue create` with:
-   - Title: `<type>: <description>`
-   - Assignee: determined by steps 1–3
-   - Labels: `human-decision` + type label + priority
-   - Body: finding summary + proposed options + dependency notes
-6. **Add to project board.** Place in "Ready" column (or "Backlog" if blocked).
+After `/workflows:review`, classify findings and assign issues using
+`.claude/commands/workflows/triage.md`.
 
 ## Dependency Protocol
 
@@ -135,11 +115,18 @@ Add a `### Dependencies` section to the issue body:
 ```
 
 ### When creating issues
-Before creating a new issue, the agent should:
-1. Search open issues for overlapping scope (`gh issue list --search "<keywords>"`)
-2. If a dependency exists, add it to the Dependencies section
-3. If the dependency is unresolved, add the `blocked` label
-4. Link the issues bidirectionally (add a comment on the blocking issue too)
+Before creating a new issue, the agent must:
+1. Search ALL open issues (any status except Done) for overlapping scope
+   (`gh issue list --search "<keywords>"`)
+2. For each match, classify: **blocks**, **depends on**, or **duplicates**.
+   An implementation task that presupposes answers to an open
+   `human-decision` issue is a dependency.
+3. Add matches to a `### Dependencies` section in the new issue body
+4. Link bidirectionally (comment on the related issue too)
+5. If a blocking dependency is unresolved, add `blocked` label and do
+   NOT mark the new issue as "Ready"
+6. Add the issue to the project board
+   (`gh project item-add 1 --owner thrialectics --url <issue-url>`)
 
 ### When closing issues
 After an issue closes, check for issues with `blocked` label that

@@ -95,6 +95,7 @@ export function onTickGame(gameId: t.GameId, game: t.Game, timeSecs: number, del
           secsLeft: config.SCORE_SECS,
           isReady: new Set<string>(),
           scores,
+          guesses: phase.guesses,
         }
         game.broadcast(currentGameState(gameId, game))
       }
@@ -169,7 +170,6 @@ export function onClientMessage(state: t.State, message: t.ToServerMessage, webS
         mood: loungeInfo.mood,
         webSocket,
         previousScoresAndGuesses: [],
-        currentGuess: undefined,
       })
       newGame.broadcast(currentGameState(gameId, newGame))
 
@@ -201,7 +201,6 @@ export function onClientMessage(state: t.State, message: t.ToServerMessage, webS
           mood: state.lounge.get(message.playerId)?.mood || '😀',
           webSocket,
           previousScoresAndGuesses: [],
-          currentGuess: undefined,
         })
       }
 
@@ -330,6 +329,7 @@ export function currentGameState(gameId: t.GameId, game: t.Game): t.ToClientMess
         gameId,
         category: phase.category,
         playerScores: [...phase.scores.entries()],
+        guesses: [...phase.guesses.entries()],
         isReady: game.players.map(info => [info.id, phase.isReady.has(info.id)]),
         secsLeft: phase.secsLeft,
       }

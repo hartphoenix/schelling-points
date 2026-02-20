@@ -6,3 +6,6 @@ scoring-sandbox/dist/
 
 # Per-user Claude Code settings (permissions, machine-specific paths)
 .claude/settings.local.json
+
+# Ephemeral agent working files (local only)
+.claude/todos/
