@@ -11,12 +11,29 @@
     overflow-y: auto;
 }
 
+.avatar-wrapper{
+    position: relative;
+}
+
 .player-avatar{
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 45px;
     height: 45px;
     border-radius: 50%;
+    color: var(--black);
+    font-size: 1.25rem;
+    font-weight: 500;
+    text-transform: uppercase;
 }
 
+.avatar-mood{
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    font-size: 1.25rem;
+}
 .avatar-picker{
     display: flex;
     justify-content: center;
@@ -41,21 +58,21 @@
     border-radius: 50%;
 }
 
-.btn-qr {
+.btn-icon {
     background: none;
     color: inherit;
     border: none;
     padding: 0;
     cursor: pointer;
 }
-.qr-icon {
+.icon {
     cursor: pointer;
     opacity: 0.8;
     transition: opacity 0.3s ease;
     background-color: transparent;
 }
 
-.qr-icon:hover {
+.icon:hover {
     opacity: 1;
 }
 
@@ -66,4 +83,13 @@
     background: rgba(255, 255, 255, 0.06); 
     backdrop-filter: blur(12px);
     color: var(--cream);
+    margin: auto;
+}
+
+#copy-popover {
+    background: none;
+    color: var(--cream);
+    border: none;
+    padding: 0;
+    margin: auto;
 }

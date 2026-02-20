@@ -6,6 +6,11 @@ import { Guesses } from "./client/Guesses"
 import { Lounge } from "./client/Lounge"
 import { Lobby } from "./client/Lobby"
 import { Scores } from "./client/Scores"
+import '../static/styles/global.css'
+import '../static/styles/lounge.css'                                          
+import '../static/styles/lobby.css'                                           
+import '../static/styles/guess.css'                                           
+
 import { MoodPicker } from './client/MoodPicker'
 
 const router = Router.createBrowserRouter([
