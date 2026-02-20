@@ -1,6 +1,7 @@
 import * as t from './types'
 import * as React from 'react'
 import { Timer } from './components/timer'
+import { playerColor } from './playerColor'
 
 type Props = {
   gameId: t.GameId
@@ -60,7 +61,7 @@ function MyResult({ guess, score }: {
 }
 
 function AllResultsDropdown({ results }: {
-  results: { name: string, guess: string, score: number }[]
+  results: { name: string, guess: string, score: number, color: string }[]
 }) {
   const [isOpen, setIsOpen] = React.useState(false)
 
@@ -76,6 +77,7 @@ function AllResultsDropdown({ results }: {
         <ul className="results-list">
           {results.map((r, i) => (
             <li key={i}>
+              <span className="player-dot" style={{background: `var(${r.color})`}} />
               {r.name}: "{r.guess}" - +{r.score} pts
             </li>
           ))}
@@ -128,7 +130,7 @@ export function Scores({ gameId, playerId, mailbox, scores, category, otherPlaye
     name: nameOf.get(id) ?? id,
     guess: guesses?.find(([gId]) => gId === id)?.[1] ?? '-',
     score,
-    // TODO: figure out how to handle player bubble color, may get rid of this depending on handling
+    color: playerColor(id).primary,
   })).sort((a, b) => b.score - a.score)
 
   // OLD CODE - Sort descending by score

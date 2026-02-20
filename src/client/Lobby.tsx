@@ -6,6 +6,7 @@ import { QRCode } from 'react-qrcode-logo'
 import { Timer } from './components/timer'
 import { MoodPicker } from './MoodPicker'
 import { InstructionsPopover } from './InstructionsPopover'
+import { playerColor } from './playerColor'
 
 type Props = {
   mailbox: Box
@@ -23,17 +24,6 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, mood, play
   const nameOf = new Map(otherPlayers.map(([id, name]) => [id, name]))
   const moodOf = new Map(otherPlayers.map(([id, name, mood]) => [id, mood]))
 
-  const colors = [                                                              
-    '--pink', '--pink-light',                                                 
-    '--coral', '--coral-light',                                                 
-    '--gold', '--gold-light',                                                   
-    '--green', '--green-light',                                                 
-    '--teal', '--teal-light',                                                   
-    '--blue', '--blue-light',                                                   
-    '--cyan', '--cyan-light',                                                   
-    '--lavender', '--lavender-light',
-    '--purple', '--purple-light',
-  ]
   const [currentMood, setCurrentMood] = React.useState(mood)
 
   function handleMoodChange(newMood: t.Mood) {
@@ -109,10 +99,10 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, mood, play
         </h2>
       </div>
       <div className="players-joined">
-        {isReady.filter(([id, ready]) => ready).map(([id, ready], index) =>
+        {isReady.filter(([id, ready]) => ready).map(([id]) =>
           <div className="avatar-wrapper" key={id}>
             <div className="player-avatar" style={{background:
-            `var(${colors[index % colors.length]})`}}>
+            `var(${playerColor(id).primary})`}}>
               {nameOf.get(id)?.charAt(0)}
         </div>
               <span className="avatar-mood">{moodOf.get(id)}</span>

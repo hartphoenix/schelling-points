@@ -2,18 +2,7 @@ import * as React from 'react'
 import * as t from './types'
 import { Box } from './mail'
 import { Timer } from './components/timer'
-
-const colors = [                                                              
-    '--pink', '--pink-light',                                                 
-    '--coral', '--coral-light',                                                 
-    '--gold', '--gold-light',                                                   
-    '--green', '--green-light',                                                 
-    '--teal', '--teal-light',                                                   
-    '--blue', '--blue-light',                                                   
-    '--cyan', '--cyan-light',                                                   
-    '--lavender', '--lavender-light',
-    '--purple', '--purple-light',
-  ]
+import { playerColor } from './playerColor'
 
 function GuessInput(props: { onSubmit: (guess: string) => void, locked: boolean }) {
   const [guess, setGuess] = React.useState('')
@@ -54,12 +43,12 @@ function PlayerProgress(props: { hasGuessed: [string, boolean][] }) {
   return <div className="player-progress"> 
             <p>{lockedIn} of {total} locked in</p>
             <div className="player-progress-dots">
-              {props.hasGuessed.map(([id, done], i) => ( 
-                <div                                                                      
+              {props.hasGuessed.map(([id, done]) => (
+                <div
                   key={id}
                   className="player-progress-dot"
                   style={{
-                    background: `var(${colors[i % colors.length]})`,
+                    background: `var(${playerColor(id).primary})`,
                     opacity: done ? 1 : 0.3,
                   }}
                 />
