@@ -36,31 +36,52 @@ export function Lounge({ mailbox, playerId, mood, otherPlayers }: Props) {
 
   if (!joined) {
     return (
-      <div className="lounge">
-        <h1>Schelling Points</h1>
-        <input
-          type="text"
-          placeholder="Your name"
-          value={playerName}
-          onChange={e => setPlayerName(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && handleJoin()}
-        />
-        <MoodPicker currentMood={currentMood} onSelect={handleMoodChange} />
-        <button onClick={handleJoin}>Join</button>
+      <div className="screen lounge">
+        <div className="title-block">
+          <h1 className="title">The Schelling Point</h1>
+          <p className="subtitle">Do you & your friends think alike?</p> 
+        </div>
+        <div className="screen-footer">
+          <input className="input"
+            type="text"
+            placeholder="Your name"
+            value={playerName}
+            onChange={e => setPlayerName(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleJoin()}
+          />
+          <button className="btn" onClick={handleJoin}>Join Lounge</button>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="lounge">
-      <h1>Lounge</h1>
-      <ul>
-        {otherPlayers.map(([id, name, mood]) => (
-          <li key={id}>{mood} {name}</li>
-        ))}
-      </ul>
-      <MoodPicker currentMood={currentMood} onSelect={handleMoodChange} />
-      <button onClick={handleNewGame}>New Game</button>
+    <div className="screen lounge">
+      <div className="screen-header">
+        <div className="title-block">
+          <h1 className="title">Lounge</h1>
+          <p className="subtitle">Do you & your friends think alike?</p> 
+        </div>
+      </div>
+      
+      <div className="screen-footer">
+        <div className="avatar-wrapper">
+          <div className="avatar-selected" style={{background: 'var(--cream)'}}>
+            {playerName.charAt(0)}
+          </div>
+          <span className="avatar-mood">{currentMood}</span>
+        </div>
+        <p>{otherPlayers.length} players online</p>
+        {/* <p>
+          {otherPlayers.map(([id, name, mood]) => (
+            <li key={id}>{name} {mood}</li>
+          ))}
+        </p> */}
+        <MoodPicker currentMood={currentMood} onSelect={handleMoodChange} />
+        <button className="btn" onClick={handleNewGame}>New Game</button>
+        <button className="btn">Join Game (placeholder)</button>
+        {/* Implement join game function */}
+      </div>
     </div>
   )
 }
