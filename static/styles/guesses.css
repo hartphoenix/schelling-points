@@ -36,3 +36,20 @@
     height: 16px;
     border-radius: 50%;
 }
+
+.locked-in {
+    justify-content: center;
+}
+
+.locked-in-msg {
+    font-family: var(--font-fancy);
+    font-size: 1.5rem;
+    color: var(--cream);
+    text-align: center;
+    opacity: 0;
+    animation: fade-in 0.3s ease forwards;
+}
+
+@keyframes fade-in {
+    to { opacity: 1; }
+}
