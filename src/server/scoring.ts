@@ -33,12 +33,14 @@ export function centroid(vectors: number[][]): number[] {
   return result
 }
 
+const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434'
+
 export async function fetchEmbeddings(texts: string[]): Promise<number[][]> {
   for (let attempt = 0; attempt <= config.EMBEDDING_RETRIES; attempt++) {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), config.EMBEDDING_TIMEOUT_MS)
     try {
-      const res = await fetch(`${config.OLLAMA_URL}/api/embed`, {
+      const res = await fetch(`${OLLAMA_URL}/api/embed`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ model: config.EMBEDDING_MODEL, input: texts }),
