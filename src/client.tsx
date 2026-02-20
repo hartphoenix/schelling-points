@@ -163,6 +163,8 @@ function App({ gameId }: Props) {
       return <Scores
         gameId={state.view.gameId}
         playerId={state.playerId}
+        playerName={playerName}
+        mood={currentMood}
         mailbox={state.mailbox}
         scores={state.view.scores}
         positions={state.view.positions}
