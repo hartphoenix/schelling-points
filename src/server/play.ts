@@ -261,15 +261,18 @@ export function onClientMessage(state: t.State, message: t.ToServerMessage, webS
         break
       }
       game.phase.guesses.set(message.playerId, message.guess)
-      game.broadcast(currentGameState(message.gameId, game))
 
+      const phase = game.phase
       const livePlayerIds = game.players
         .filter(p => p.webSocket.readyState === WebSocket.OPEN)
         .map(p => p.id)
       const allGuessed = livePlayerIds.length > 0
-        && livePlayerIds.every(id => game.phase.type === 'GUESSES' && game.phase.guesses.has(id))
+        && livePlayerIds.every(id => phase.guesses.has(id))
+
       if (allGuessed) {
         scoreRound(message.gameId, game)
+      } else {
+        game.broadcast(currentGameState(message.gameId, game))
       }
       break
     }
