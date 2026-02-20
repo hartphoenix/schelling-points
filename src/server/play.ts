@@ -43,6 +43,26 @@ function onTick(state: t.State, timeSecs: number, deltaSecs: number) {
   }
 }
 
+function transitionToScores(
+  gameId: t.GameId,
+  game: t.Game,
+  phase: Extract<t.Phase, { type: 'GUESSES' }>,
+  scores: Map<t.PlayerId, number>,
+  positions: Map<t.PlayerId, [number, number]>,
+) {
+  game.phase = {
+    type: 'SCORES',
+    round: phase.round,
+    category: phase.category,
+    secsLeft: config.SCORE_SECS,
+    isReady: new Set<string>(),
+    scores,
+    positions,
+    guesses: phase.guesses,
+  }
+  game.broadcast(currentGameState(gameId, game))
+}
+
 function newGuessPhase(round: number, category: string): t.Phase {
   return {
     type: 'GUESSES',
@@ -92,43 +112,43 @@ export function onTickGame(gameId: t.GameId, game: t.Game, timeSecs: number, del
         const round = phase.round
         game.scoringInProgress = true
 
-        ;(async () => {
-          let scores: Map<t.PlayerId, number>
-          let positions: Map<t.PlayerId, [number, number]>
-          try {
-            const result = await scoring.scoreGuesses(guesses)
-            scores = result.scores
-            positions = result.positions
-          } catch (err) {
-            console.error('scoring failed, awarding 0s:', err)
-            scores = new Map<t.PlayerId, number>()
-            positions = new Map<t.PlayerId, [number, number]>()
-          }
+          ; (async () => {
+            let scores: Map<t.PlayerId, number>
+            let positions: Map<t.PlayerId, [number, number]>
+            try {
+              const result = await scoring.scoreGuesses(guesses)
+              scores = result.scores
+              positions = result.positions
+            } catch (err) {
+              console.error('scoring failed, awarding 0s:', err)
+              scores = new Map<t.PlayerId, number>()
+              positions = new Map<t.PlayerId, [number, number]>()
+            }
 
-          game.phase = {
-            type: 'SCORES',
-            round,
-            category,
-            secsLeft: config.SCORE_SECS,
-            isReady: new Set<string>(),
-            scores,
-            positions,
-            guesses,
-          }
+            game.phase = {
+              type: 'SCORES',
+              round,
+              category,
+              secsLeft: config.SCORE_SECS,
+              isReady: new Set<string>(),
+              scores,
+              positions,
+              guesses,
+            }
 
-          const guessesAndScores: [t.PlayerId, string, number][] = [...guesses.entries()].map(
-            ([id, guess]) => [id, guess, scores.get(id) ?? 0]
-          )
-          game.previousScores.push({ category, guessesAndScores })
-          for (const player of game.players) {
-            const guess = guesses.get(player.id) ?? ''
-            const score = scores.get(player.id) ?? 0
-            player.previousScoresAndGuesses.push([score, guess])
-          }
+            const guessesAndScores: [t.PlayerId, string, number][] = [...guesses.entries()].map(
+              ([id, guess]) => [id, guess, scores.get(id) ?? 0]
+            )
+            game.previousScores.push({ category, guessesAndScores })
+            for (const player of game.players) {
+              const guess = guesses.get(player.id) ?? ''
+              const score = scores.get(player.id) ?? 0
+              player.previousScoresAndGuesses.push([score, guess])
+            }
 
-          game.scoringInProgress = false
-          game.broadcast(currentGameState(gameId, game))
-        })()
+            game.scoringInProgress = false
+            game.broadcast(currentGameState(gameId, game))
+          })()
       }
       break
     }
@@ -297,14 +317,26 @@ export function onClientMessage(state: t.State, message: t.ToServerMessage, webS
     }
 
     case 'GUESS': {
-      //TODO: if this is the final player to submit a guess, skip the clock & switch to scores
       const game = state.games.get(message.gameId)
       if (!game || game.phase.type !== 'GUESSES') {
         console.warn('GUESS: game not found or not in GUESSES phase', message.gameId)
         break
       }
       game.phase.guesses.set(message.playerId, message.guess)
-      game.broadcast(currentGameState(message.gameId, game))
+
+      const livePlayerIds = game.players
+        .filter(info => info.webSocket.readyState === WebSocket.OPEN)
+        .map(info => info.id)
+      const allGuessed = livePlayerIds.every(id => game.phase.type === 'GUESSES' && game.phase.guesses.has(id))
+
+      if (allGuessed) {
+        // TODO: Calculate scores
+        const scores = new Map<t.PlayerId, number>()
+        const positions = new Map<t.PlayerId, [number, number]>()
+        transitionToScores(message.gameId, game, game.phase, scores, positions)
+      } else {
+        game.broadcast(currentGameState(message.gameId, game))
+      }
       break
     }
   }
