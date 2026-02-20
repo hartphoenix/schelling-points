@@ -74,7 +74,13 @@ This command takes a work document (plan, specification, or todo file) and execu
    - Only proceed after user explicitly says "yes, commit to `[base_branch]`"
    - Never commit directly to the base branch without explicit permission
 
-3. **Create Todo List**
+3. **Ensure Working Directories**
+
+   ```bash
+   mkdir -p .claude/todos/agent
+   ```
+
+4. **Create Todo List**
    - Use TodoWrite to break plan into actionable tasks
    - Include dependencies between tasks
    - Prioritize based on what needs to be done first
@@ -209,14 +215,25 @@ This command takes a work document (plan, specification, or todo file) and execu
    )"
    ```
 
-3. **Update Plan Status**
+3. **Resource Cleanup**
+
+   After PR creation, clean up ephemeral working docs:
+
+   1. If a brainstorm file was used as input, check whether any other
+      open branches reference it (`git log --all --oneline -- <file>`).
+      If no other branches reference it, delete it.
+   2. Same check for the plan file.
+   3. Delete any `.claude/todos/agent/` working files for completed items.
+   4. Commit the deletions as part of the PR.
+
+4. **Update Plan Status**
 
    If the input document has YAML frontmatter with a `status` field, update it to `completed`:
    ```
    status: active  →  status: completed
    ```
 
-4. **Notify User**
+5. **Notify User**
    - Summarize what was completed
    - Link to PR
    - Note any follow-up work needed
