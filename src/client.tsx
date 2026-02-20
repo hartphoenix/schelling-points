@@ -113,6 +113,7 @@ function App({ gameId }: Props) {
           <input className="input"
             type="text"
             placeholder="Your name"
+            maxLength={20}
             value={nameInput}
             autoFocus
             onChange={e => setNameInput(e.target.value)}
