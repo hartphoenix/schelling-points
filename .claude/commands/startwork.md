@@ -36,8 +36,8 @@ If there are no candidates in Ready or Backlog, say so and stop.
 ### 2. Detect
 
 Check each candidate against active work for blocking conditions.
-This step runs for ALL candidates — including when a specific issue
-number is provided via `/startwork #N`.
+When `/startwork #N` is provided, run Detect only on the specified
+issue. Otherwise, check all candidates.
 
 For each candidate, check for these conditions:
 
@@ -55,11 +55,10 @@ yet merged). Both can appear on the same candidate.
 
 **Overlap detection for `conflict`** — use a layered approach:
 
-1. **Labels** — candidate and an active item share a component label
-   (anything that isn't a type, triage, or priority label)
-2. **PR files** — an open PR's changed files overlap with files the
+1. **PR files** — an open PR's changed files overlap with files the
    candidate likely touches (from description or related PRs)
-3. **Semantic** — titles or descriptions suggest overlapping scope
+2. **Semantic** — titles or descriptions suggest overlapping scope
+   (flag as "possible conflict" — prefer file-based signals)
 
 Output: a per-candidate list of flags, each with type, related
 issue/PR number, assignee (if any), and a brief description.
