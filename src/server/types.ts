@@ -9,7 +9,6 @@ export interface PlayerInfo {
   mood: t.Mood,
   webSocket: WebSocket,
   previousScoresAndGuesses: [number, string][],
-  currentGuess?: string,
 }
 
 export interface Category {
@@ -21,7 +20,7 @@ export interface Category {
 export type Phase =
   | { type: 'LOBBY', secsLeft?: number, isReady: Set<t.PlayerId>, }
   | { type: 'GUESSES', round: number, category: string, secsLeft: number, guesses: Map<t.PlayerId, string> }
-  | { type: 'SCORES', round: number, category: string, isReady: Set<t.PlayerId>, secsLeft: number, scores: Map<t.PlayerId, number> }
+  | { type: 'SCORES', round: number, category: string, isReady: Set<t.PlayerId>, secsLeft: number, scores: Map<t.PlayerId, number>, guesses: Map<t.PlayerId, string> }
 
 export interface RoundScore {
   category: string;

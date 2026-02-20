@@ -7,7 +7,7 @@ export type View =
   | { type: 'LOUNGE' }
   | { type: 'LOBBY', gameId: string, isReady: [t.PlayerId, boolean][], secsLeft?: number }
   | { type: 'GUESSES', gameId: string, hasGuessed: [t.PlayerId, boolean][], category: string, secsLeft: number, guess?: string }
-  | { type: 'SCORES', gameId: string, isReady: [t.PlayerId, boolean][], secsLeft?: number, scores: [t.PlayerId, number][], category: string }
+  | { type: 'SCORES', gameId: string, isReady: [t.PlayerId, boolean][], secsLeft?: number, scores: [t.PlayerId, number][], guesses: [t.PlayerId, string][], category: string }
 
 export type State = {
   audioPlayer: audio.Player,
