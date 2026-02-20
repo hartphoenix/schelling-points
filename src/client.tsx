@@ -9,7 +9,8 @@ import { Scores } from "./client/Scores"
 import '../static/styles/global.css'
 import '../static/styles/lounge.css'                                          
 import '../static/styles/lobby.css'                                           
-import '../static/styles/guess.css'                                           
+import '../static/styles/guesses.css'    
+import '../static/styles/scores.css'                                           
 
 import { MoodPicker } from './client/MoodPicker'
 
