@@ -8,6 +8,7 @@ type Props = {
   playerId: t.PlayerId
   mailbox: t.State["mailbox"]
   scores: [t.PlayerId, number][]
+  positions?: [t.PlayerId, number, number][]
   category: string
   otherPlayers: [t.PlayerId, t.PlayerName, t.Mood][]
   isReady: [string, boolean][]

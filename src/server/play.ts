@@ -2,6 +2,7 @@ import WebSocket from 'ws'
 import * as config from '../config'
 import * as t from './types'
 import * as util from './util'
+import * as scoring from './scoring'
 
 function shuffle<T>(array: T[]): T[] {
   const result = [...array]
@@ -82,22 +83,52 @@ export function onTickGame(gameId: t.GameId, game: t.Game, timeSecs: number, del
     }
 
     case 'GUESSES': {
+      if (game.scoringInProgress) break
       phase.secsLeft = Math.max(0, phase.secsLeft - deltaSecs)
 
       if (phase.secsLeft === 0) {
-        // TODO: Calculate scores
-        const scores = new Map<t.PlayerId, number>()
+        const guesses = phase.guesses
+        const category = phase.category
+        const round = phase.round
+        game.scoringInProgress = true
 
-        game.phase = {
-          type: 'SCORES',
-          round: phase.round,
-          category: phase.category,
-          secsLeft: config.SCORE_SECS,
-          isReady: new Set<string>(),
-          scores,
-          guesses: phase.guesses,
-        }
-        game.broadcast(currentGameState(gameId, game))
+        ;(async () => {
+          let scores: Map<t.PlayerId, number>
+          let positions: Map<t.PlayerId, [number, number]>
+          try {
+            const result = await scoring.scoreGuesses(guesses)
+            scores = result.scores
+            positions = result.positions
+          } catch (err) {
+            console.error('scoring failed, awarding 0s:', err)
+            scores = new Map<t.PlayerId, number>()
+            positions = new Map<t.PlayerId, [number, number]>()
+          }
+
+          game.phase = {
+            type: 'SCORES',
+            round,
+            category,
+            secsLeft: config.SCORE_SECS,
+            isReady: new Set<string>(),
+            scores,
+            positions,
+            guesses,
+          }
+
+          const guessesAndScores: [t.PlayerId, string, number][] = [...guesses.entries()].map(
+            ([id, guess]) => [id, guess, scores.get(id) ?? 0]
+          )
+          game.previousScores.push({ category, guessesAndScores })
+          for (const player of game.players) {
+            const guess = guesses.get(player.id) ?? ''
+            const score = scores.get(player.id) ?? 0
+            player.previousScoresAndGuesses.push([score, guess])
+          }
+
+          game.scoringInProgress = false
+          game.broadcast(currentGameState(gameId, game))
+        })()
       }
       break
     }
@@ -329,6 +360,7 @@ export function currentGameState(gameId: t.GameId, game: t.Game): t.ToClientMess
         gameId,
         category: phase.category,
         playerScores: [...phase.scores.entries()],
+        positions: [...phase.positions.entries()].map(([id, [x, y]]) => [id, x, y] as [t.PlayerId, number, number]),
         guesses: [...phase.guesses.entries()],
         isReady: game.players.map(info => [info.id, phase.isReady.has(info.id)]),
         secsLeft: phase.secsLeft,
