@@ -99,6 +99,8 @@ function App({ gameId }: Props) {
         gameId={state.view.gameId}
         isReady={state.view.isReady}
         secsLeft={state.view.secsLeft}
+        mood={state.mood}
+        playerName={state.playerName}
         otherPlayers={state.otherPlayers}
       />
 

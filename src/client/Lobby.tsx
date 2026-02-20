@@ -1,8 +1,10 @@
 import * as t from './types'
+import * as React from 'react'
 import { Box } from './mail'
 import type { JSX } from 'react'
 import { QRCode } from 'react-qrcode-logo'
 import { Timer } from './components/timer'
+import { MoodPicker } from './MoodPicker'
 
 type Props = {
   mailbox: Box
@@ -10,12 +12,20 @@ type Props = {
   gameId: t.GameId
   isReady: [t.PlayerId, boolean][]
   secsLeft?: number
+  mood: t.Mood
+  playerName: t.PlayerName
   otherPlayers: [t.PlayerId, t.PlayerName, t.Mood][]
 }
 
-export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, otherPlayers }: Props) {
+export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, mood, playerName, otherPlayers }: Props) {
   // Build a name lookup from otherPlayers
   const nameOf = new Map(otherPlayers.map(([id, name]) => [id, name]))
+  const [currentMood, setCurrentMood] = React.useState(mood)
+
+  function handleMoodChange(newMood: t.Mood) {
+    setCurrentMood(newMood)
+    mailbox.send({ type: 'SET_PLAYER_INFO', gameId, playerId, playerName, mood: newMood })
+  }
 
   function handleToggleReady() {
     const currentlyReady = isReady.find(([id]) => id === playerId)?.[1] ?? false
@@ -65,6 +75,7 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, otherPlaye
       </ul>
       {secsLeft !== undefined
         && <p>Starting in {Timer({ secsLeft })}...</p>}
+      <MoodPicker currentMood={currentMood} onSelect={handleMoodChange} />
       <button onClick={handleToggleReady}>
         {isReady.find(([id]) => id === playerId)?.[1] ? 'Unready' : 'Ready'}
       </button>
