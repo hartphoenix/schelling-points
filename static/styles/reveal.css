@@ -1,0 +1,26 @@
+.reveal .screen-header h1 {
+  font-size: 3rem;
+}
+
+.reveal .meld-indicator {
+  color: var(--teal);
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.reveal .my-guess {
+  text-align: center;
+}
+
+.reveal .my-guess p {
+  font-size: 0.85rem;
+  color: var(--cream);
+  opacity: 0.7;
+  letter-spacing: 0.1em;
+}
+
+.scatter-plot {
+  width: 100%;
+  max-width: 300px;
+}

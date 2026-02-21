@@ -61,14 +61,14 @@ type Props = {
   mailbox: Box
   playerId: t.PlayerId
   gameId: t.GameId
-  category: string
+  prompt: string
   secsLeft: number
   hasGuessed: [t.PlayerId, boolean][]
   round: number
   totalRounds: number
 }
 
-export function Guesses({ mailbox, playerId, gameId, category, secsLeft, hasGuessed, round, totalRounds }: Props) {
+export function Guesses({ mailbox, playerId, gameId, prompt, secsLeft, hasGuessed, round, totalRounds }: Props) {
   function handleSubmit(guess: string) {
     mailbox.send({
       type: 'GUESS',
@@ -92,11 +92,11 @@ export function Guesses({ mailbox, playerId, gameId, category, secsLeft, hasGues
       </div>
       <div className="screen-header">
         <h2>Communicate Without Speaking</h2>
-        <h1>Round {round + 1} of {totalRounds}</h1>
+        <h1>{round + 1 > totalRounds ? `Round ${round + 1}` : `Round ${round + 1} of ${totalRounds}`}</h1>
         {/*should add the game id feature here */}
       </div>
       <div className="category-display">
-        <h1>{category}</h1>
+        <h1>{prompt}</h1>
       </div>
       <div className="screen-footer">
         <PlayerProgress hasGuessed={hasGuessed} />
