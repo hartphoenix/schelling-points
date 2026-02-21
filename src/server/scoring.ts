@@ -1,38 +1,15 @@
 import * as config from '../config'
 import type { PlayerId } from '../types'
+import { cosineSimilarity, centroid } from './math'
 import { nearestWord, type Vocab } from './vocab'
+
+// Re-export so existing consumers (tests, play.ts) don't break
+export { cosineSimilarity, centroid }
 
 export interface ScoringResult {
   scores: Map<PlayerId, number>
   positions: Map<PlayerId, [number, number]>
   centroidWord: string
-}
-
-export function cosineSimilarity(a: number[], b: number[]): number {
-  let dot = 0
-  let magA = 0
-  let magB = 0
-  for (let i = 0; i < a.length; i++) {
-    dot += a[i] * b[i]
-    magA += a[i] * a[i]
-    magB += b[i] * b[i]
-  }
-  const denom = Math.sqrt(magA) * Math.sqrt(magB)
-  return denom === 0 ? 0 : dot / denom
-}
-
-export function centroid(vectors: number[][]): number[] {
-  const dim = vectors[0].length
-  const result = new Array<number>(dim).fill(0)
-  for (const vec of vectors) {
-    for (let i = 0; i < dim; i++) {
-      result[i] += vec[i]
-    }
-  }
-  for (let i = 0; i < dim; i++) {
-    result[i] /= vectors.length
-  }
-  return result
 }
 
 const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434'
@@ -85,7 +62,9 @@ export async function scoreGuesses(guesses: Map<PlayerId, string>, vocab?: Vocab
   const embeddings = await fetchEmbeddings(normalized.map(([, g]) => g))
   const cent = centroid(embeddings)
 
-  const centroidWord = vocab ? nearestWord(cent, vocab) : ''
+  const centroidWord = vocab
+    ? nearestWord(cent, vocab, normalized.map(([, g]) => g))
+    : ''
 
   for (let i = 0; i < normalized.length; i++) {
     const [id] = normalized[i]

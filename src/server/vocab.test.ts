@@ -10,6 +10,7 @@ describe('nearestWord', () => {
       [0, 1, 0],   // dog — points along y-axis
       [0, 0, 1],   // fish — points along z-axis
     ],
+    globalCentroid: [1/3, 1/3, 1/3],
   }
 
   it('returns exact match for identical vector', () => {
@@ -32,7 +33,7 @@ describe('nearestWord', () => {
   })
 
   it('handles single-word vocab', () => {
-    const singleVocab: Vocab = { words: ['only'], vectors: [[1, 0, 0]] }
+    const singleVocab: Vocab = { words: ['only'], vectors: [[1, 0, 0]], globalCentroid: [1, 0, 0] }
     expect(nearestWord([0, 1, 0], singleVocab)).toBe('only')
   })
 })

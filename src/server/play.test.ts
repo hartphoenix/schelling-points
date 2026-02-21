@@ -8,7 +8,7 @@ function mockWs(readyState = WebSocket.OPEN): WebSocket {
   return { readyState, send: vi.fn() } as unknown as WebSocket
 }
 
-const stubVocab = { words: ['cat', 'dog'], vectors: [[1], [0]] }
+const stubVocab = { words: ['cat', 'dog'], vectors: [[1], [0]], globalCentroid: [0.5] }
 
 function makeGame(players: { id: string, ws?: WebSocket }[]): t.Game {
   const game = new t.Game()

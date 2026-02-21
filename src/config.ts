@@ -8,3 +8,5 @@ export const SIMILARITY_FLOOR = 0.5
 export const EMBEDDING_MODEL = 'nomic-embed-text'
 export const EMBEDDING_TIMEOUT_MS = 10_000
 export const EMBEDDING_RETRIES = 2
+export const GLOBAL_CENTER_PENALTY = 0.3
+export const FREQUENCY_PENALTY = 0.1
