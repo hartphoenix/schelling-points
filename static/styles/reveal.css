@@ -9,6 +9,17 @@
   text-transform: uppercase;
 }
 
+.reveal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
 .reveal .my-guess {
   text-align: center;
   flex-shrink: 0;

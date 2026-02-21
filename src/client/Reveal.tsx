@@ -57,12 +57,14 @@ export function Reveal({ gameId, playerId, playerName, mailbox, centroidWord, ce
         {melded && <p className="meld-indicator">Mind Meld!</p>}
       </div>
 
-      {positions.length > 0 && (
-        <ScatterPlot positions={positions} playerId={playerId} nameOf={nameOf} guesses={guesses} />
-      )}
+      <div className="reveal-content">
+        {positions.length > 0 && (
+          <ScatterPlot positions={positions} playerId={playerId} nameOf={nameOf} guesses={guesses} />
+        )}
 
-      <div className="my-guess">
-        <p>You said: {myGuess ? `"${myGuess}"` : '—'}</p>
+        <div className="my-guess">
+          <p>You said: {myGuess ? `"${myGuess}"` : '—'}</p>
+        </div>
       </div>
 
       <div className="screen-footer">
