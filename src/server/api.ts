@@ -36,9 +36,6 @@ export function addWebsockets(state: t.State, app: express.Application) {
   })
 }
 
-export function addRest(app: express.Application) {
-}
-
 export function addStatic(app: express.Application) {
   app.use(express.static(path.resolve('dist')))
   app.get('*path', (req, res) => {

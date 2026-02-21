@@ -6,6 +6,9 @@ import { Guesses } from "./client/Guesses"
 import { Lounge } from "./client/Lounge"
 import { Lobby } from "./client/Lobby"
 import { Scores } from "./client/Scores"
+import { ScreenBackground } from './client/ScreenBackground'
+import { PlayerRing } from "./client/PlayerRing"
+import { MoodPicker } from './client/MoodPicker'
 import '../static/styles/global.css'
 import '../static/styles/lounge.css'                                          
 import '../static/styles/lobby.css'                                           
@@ -13,8 +16,8 @@ import '../static/styles/guesses.css'
 import '../static/styles/scores.css'
 import '../static/styles/mood-picker.css'
 import '../static/styles/instructions.css'
-
-import { MoodPicker } from './client/MoodPicker'
+import '../static/styles/screen-background.css'
+import '../static/styles/radial-visualization.css'
 
 const router = Router.createBrowserRouter([
   {
@@ -110,6 +113,7 @@ function App({ gameId }: Props) {
           <h1 className="title">The Schelling Point</h1>
           <p className="subtitle">Do you & your friends think alike?</p>
         </div>
+        <PlayerRing />
         <div className="screen-footer">
           <input className="input"
             type="text"
@@ -187,6 +191,7 @@ function App({ gameId }: Props) {
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
+    <ScreenBackground />
     <Router.RouterProvider router={router} />
   </React.StrictMode>
 )

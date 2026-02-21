@@ -35,6 +35,14 @@ body {
     font-family: var(--font-body);
 }
 
+#root {
+    position: relative;
+    max-width: 430px;
+    min-height: 100vh;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
 p {
     font-family: var(--font-body);
     color: rgba(255, 255, 255, 0.35);
@@ -45,7 +53,7 @@ p {
     text-transform: uppercase;
 }
 
-.screen { 
+.screen {
     border: 1px solid rgba(255, 255, 255, 0.1);
     width: 100%;
     max-width: 430px;
@@ -54,8 +62,10 @@ p {
     flex-direction: column;
     align-items: center;
     margin: 0 auto;
-    padding: 20px 20px; 
-    gap: 50px; 
+    padding: 20px 20px;
+    gap: 50px;
+    position: relative;
+    z-index: 10;
 }
 
 .screen-topbar {
