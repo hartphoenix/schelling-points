@@ -524,6 +524,81 @@ function goToNextRound(gameId: t.GameId, game: t.Game, state: t.State) {
   game.broadcast(currentGameState(gameId, game))
 }
 
+/**
+ * Handle a player disconnecting from a game.
+ * Removes them from the player list and broadcasts updates so remaining
+ * players see the departure. Cleans up empty games.
+ */
+export function onPlayerDisconnect(
+  playerId: t.PlayerId,
+  gameId: t.GameId,
+  game: t.Game,
+  state: t.State,
+) {
+  const playerIdx = game.players.findIndex(p => p.id === playerId)
+  if (playerIdx === -1) return
+
+  game.players.splice(playerIdx, 1)
+
+  // If no players remain, delete the game entirely
+  if (game.players.length === 0) {
+    state.games.delete(gameId)
+    return
+  }
+
+  switch (game.phase.type) {
+    case 'LOBBY': {
+      // Clean up ready state for departed player
+      game.phase.isReady.delete(playerId)
+
+      // Cancel countdown if conditions no longer hold (need 2+ ready players)
+      const livePlayerIds = game.players
+        .filter(p => p.webSocket.readyState === WebSocket.OPEN)
+        .map(p => p.id)
+      const allReady = livePlayerIds.length >= 2
+        && livePlayerIds.every(id => game.phase.type === 'LOBBY' && game.phase.isReady.has(id))
+
+      if (!allReady && game.phase.secsLeft !== undefined) {
+        game.phase.secsLeft = undefined
+      }
+
+      // Broadcast updated member list + game state to remaining players
+      game.broadcast(game.memberChangeMessage(gameId))
+      game.broadcast(currentGameState(gameId, game))
+      break
+    }
+
+    case 'GUESSES': {
+      game.broadcast(game.memberChangeMessage(gameId))
+      // Check if all remaining live players have guessed (departure may complete the round)
+      const livePlayerIds = game.players
+        .filter(p => p.webSocket.readyState === WebSocket.OPEN)
+        .map(p => p.id)
+      const allGuessed = livePlayerIds.length > 0
+        && livePlayerIds.every(id => game.phase.type === 'GUESSES' && game.phase.guesses.has(id))
+      if (allGuessed) {
+        scoreRound(gameId, game, state)
+      } else {
+        game.broadcast(currentGameState(gameId, game))
+      }
+      break
+    }
+
+    case 'REVEAL': {
+      game.broadcast(game.memberChangeMessage(gameId))
+      game.broadcast(currentGameState(gameId, game))
+      break
+    }
+
+    case 'CONTINUE': {
+      game.phase.isLeaving.add(playerId)
+      game.broadcast(game.memberChangeMessage(gameId))
+      checkContinueVotes(gameId, game, state)
+      break
+    }
+  }
+}
+
 export function currentGameState(gameId: t.GameId, game: t.Game): t.ToClientMessage {
   switch (game.phase.type) {
     case 'LOBBY': {
