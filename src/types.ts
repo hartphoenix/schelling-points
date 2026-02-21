@@ -20,7 +20,3 @@ export type ToClientMessage =
   | { type: 'GUESS_STATE', gameId: GameId, category: string, hasGuessed: [PlayerId, boolean][], secsLeft: number, round: number, totalRounds: number }
   | { type: 'SCORE_STATE', gameId: GameId, category: string, playerScores: [PlayerId, number][], positions: [PlayerId, number, number][], guesses: [PlayerId, string][], isReady: [PlayerId, boolean][], secsLeft: number, round: number, totalRounds: number }
   | { type: 'NO_SUCH_GAME', gameId: GameId }
-
-export type Response =
-  | { type: 'SUCCESS', result: any }
-  | { type: 'ERROR', error: string }
