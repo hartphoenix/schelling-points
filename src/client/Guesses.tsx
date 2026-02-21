@@ -66,9 +66,10 @@ type Props = {
   hasGuessed: [t.PlayerId, boolean][]
   round: number
   totalRounds: number
+  scoring?: boolean
 }
 
-export function Guesses({ mailbox, playerId, gameId, prompt, secsLeft, hasGuessed, round, totalRounds }: Props) {
+export function Guesses({ mailbox, playerId, gameId, prompt, secsLeft, hasGuessed, round, totalRounds, scoring }: Props) {
   function handleSubmit(guess: string) {
     mailbox.send({
       type: 'GUESS',
@@ -83,12 +84,15 @@ export function Guesses({ mailbox, playerId, gameId, prompt, secsLeft, hasGuesse
       <div className="screen-topbar">
         <button className="btn-back">‹</button>
         {/*add leave function for btn-back and instructions popover button*/}
-        <div className="timer" style={{ '--timer-duration': `${secsLeft}s` } as React.CSSProperties}>
-          <svg viewBox="0 0 50 50">
-            <circle cx="25" cy="25" r="20" />
-          </svg>
-          <Timer secsLeft={secsLeft} />
-        </div>
+        {scoring
+          ? <div className="timer scoring"><p>...</p></div>
+          : <div className="timer" style={{ '--timer-duration': `${secsLeft}s` } as React.CSSProperties}>
+              <svg viewBox="0 0 50 50">
+                <circle cx="25" cy="25" r="20" />
+              </svg>
+              <Timer secsLeft={secsLeft} />
+            </div>
+        }
       </div>
       <div className="screen-header">
         <h1>{round + 1 > totalRounds ? `Round ${round + 1}` : `Round ${round + 1} of ${totalRounds}`}</h1>

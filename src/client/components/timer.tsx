@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react"
 
 export function Timer({ secsLeft }: { secsLeft: number }) {
-  const [remaining, setRemaining] = useState(Math.ceil(secsLeft))
+  const [remaining, setRemaining] = useState(Math.round(secsLeft))
 
   useEffect(() => {
-    setRemaining(Math.ceil(secsLeft)) // sync when server sends a new value
+    setRemaining(Math.round(secsLeft)) // sync when server sends a new value
   }, [secsLeft])
 
   useEffect(() => {

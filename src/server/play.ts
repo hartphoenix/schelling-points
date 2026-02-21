@@ -390,6 +390,7 @@ async function scoreRound(gameId: t.GameId, game: t.Game, state: t.State) {
 
   const { guesses, prompt, round } = phase
   game.scoringInProgress = true
+  game.broadcast({ type: 'SCORING', gameId })
 
   // Filter out guesses that repeat the prompt
   const validGuesses = filterPromptRepetitions(guesses, game.currentPrompt)

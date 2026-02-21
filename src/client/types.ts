@@ -6,7 +6,7 @@ import * as t from '../types'
 export type View =
   | { type: 'LOUNGE' }
   | { type: 'LOBBY', gameId: string, isReady: [t.PlayerId, boolean][], secsLeft?: number }
-  | { type: 'GUESSES', gameId: string, hasGuessed: [t.PlayerId, boolean][], prompt: string, secsLeft: number, guess?: string, round: number, totalRounds: number }
+  | { type: 'GUESSES', gameId: string, hasGuessed: [t.PlayerId, boolean][], prompt: string, secsLeft: number, guess?: string, round: number, totalRounds: number, scoring?: boolean }
   | { type: 'REVEAL', gameId: string, isReady: [t.PlayerId, boolean][], secsLeft?: number, centroidWord: string, centroidIsRepeat: boolean, positions: [t.PlayerId, number, number][], guesses: [t.PlayerId, string][], melded: boolean, round: number, totalRounds: number }
   | { type: 'GAME_END', gameId: string, melded: boolean, meldRound: number | null, centroidHistory: string[], playerHistory: [string, string][] }
   | { type: 'CONTINUE', gameId: string, centroidHistory: string[], playerHistory: [string, string][] }

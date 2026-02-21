@@ -39,9 +39,9 @@ export function Reveal({ gameId, playerId, playerName, mailbox, centroidWord, ce
   return (
     <div className="screen reveal">
       <div className="screen-topbar">
-        <span>{roundLabel}</span>
+        <span />
         {secsLeft !== undefined
-          ? <div className="timer">
+          ? <div className="timer" style={{ '--timer-duration': `${secsLeft}s` } as React.CSSProperties}>
               <svg viewBox="0 0 50 50">
                 <circle cx="25" cy="25" r="20" />
               </svg>
@@ -52,6 +52,7 @@ export function Reveal({ gameId, playerId, playerName, mailbox, centroidWord, ce
       </div>
 
       <div className="screen-header">
+        <h2>{roundLabel}</h2>
         <h1>{centroidWord}</h1>
         {centroidIsRepeat && <h2>(again)</h2>}
         {melded && <p className="meld-indicator">Mind Meld!</p>}
