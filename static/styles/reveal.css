@@ -11,6 +11,7 @@
 
 .reveal .my-guess {
   text-align: center;
+  flex-shrink: 0;
 }
 
 .reveal .my-guess p {
@@ -23,4 +24,6 @@
 .scatter-plot {
   width: 100%;
   max-width: 300px;
+  flex-shrink: 1;
+  min-height: 0;
 }
