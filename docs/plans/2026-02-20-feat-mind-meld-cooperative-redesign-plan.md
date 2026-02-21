@@ -1160,20 +1160,20 @@ The reducer receives LOUNGE → view transitions to LOUNGE. Done.
 
 #### Acceptance Criteria
 
-- [ ] ScatterPlot extracted to reusable component
-- [ ] Guesses screen shows prompt word (not category framing)
-- [ ] Reveal screen shows centroid word, "again" indicator, scatter plot
-- [ ] Reveal screen shows "You said: [guess]" (local player only)
-- [ ] Ready-tap on Reveal sends REVEAL_READY
-- [ ] GameEnd screen shows meld celebration with round count
-- [ ] GameEnd screen shows centroid path + player history (two columns)
-- [ ] Continue screen shows history + "Keep going" / "I'm out" buttons
-- [ ] CONTINUE_VOTE sent on button tap
-- [ ] Non-submissions display gracefully (dash/blank)
-- [ ] No individual scores visible anywhere
-- [ ] Scores.tsx removed, all SCORE_STATE references cleaned up
-- [ ] Screens use existing CSS classes, minimal new CSS
-- [ ] Project compiles, renders without errors
+- [x] ScatterPlot extracted to reusable component
+- [x] Guesses screen shows prompt word (not category framing)
+- [x] Reveal screen shows centroid word, "again" indicator, scatter plot
+- [x] Reveal screen shows "You said: [guess]" (local player only)
+- [x] Ready-tap on Reveal sends REVEAL_READY
+- [x] GameEnd screen shows meld celebration with round count
+- [x] GameEnd screen shows centroid path + player history (two columns)
+- [x] Continue screen shows history + "Keep going" / "I'm out" buttons
+- [x] CONTINUE_VOTE sent on button tap
+- [x] Non-submissions display gracefully (dash/blank)
+- [x] No individual scores visible anywhere
+- [x] Scores.tsx removed, all SCORE_STATE references cleaned up
+- [x] Screens use existing CSS classes, minimal new CSS
+- [x] Project compiles, renders without errors
 
 #### Agent Instructions
 
