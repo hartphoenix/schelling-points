@@ -6,6 +6,7 @@ import { Guesses } from "./client/Guesses"
 import { Lounge } from "./client/Lounge"
 import { Lobby } from "./client/Lobby"
 import { Scores } from "./client/Scores"
+import { ScreenBackground } from './client/ScreenBackground'
 import '../static/styles/global.css'
 import '../static/styles/lounge.css'                                          
 import '../static/styles/lobby.css'                                           
@@ -13,6 +14,7 @@ import '../static/styles/guesses.css'
 import '../static/styles/scores.css'
 import '../static/styles/mood-picker.css'
 import '../static/styles/instructions.css'
+import '../static/styles/screen-background.css'
 
 import { MoodPicker } from './client/MoodPicker'
 
@@ -181,6 +183,7 @@ function App({ gameId }: Props) {
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
+    <ScreenBackground />
     <Router.RouterProvider router={router} />
   </React.StrictMode>
 )
