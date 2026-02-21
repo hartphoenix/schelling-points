@@ -181,7 +181,8 @@ real reason" — correctness of a non-trivial algorithm IS a real reason.
 The module still gets its own file with a clean interface for meld
 comparison.
 
-**Decision needed before Phase 1 begins.**
+**Decision: Option 1 (stemmer package).** Implemented in Phase 1 —
+`src/server/stemmer.ts` wraps `stemmer@2.0.1` (Porter2).
 
 ---
 
