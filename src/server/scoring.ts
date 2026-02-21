@@ -1,9 +1,11 @@
 import * as config from '../config'
 import type { PlayerId } from '../types'
+import { nearestWord, type Vocab } from './vocab'
 
 export interface ScoringResult {
   scores: Map<PlayerId, number>
   positions: Map<PlayerId, [number, number]>
+  centroidWord: string
 }
 
 export function cosineSimilarity(a: number[], b: number[]): number {
@@ -63,12 +65,12 @@ export function similarityToScore(sim: number): number {
   return Math.round(1 + Math.max(0, (sim - config.SIMILARITY_FLOOR) / (1 - config.SIMILARITY_FLOOR)) * (config.BASE_MAX_SCORE - 1))
 }
 
-export async function scoreGuesses(guesses: Map<PlayerId, string>): Promise<ScoringResult> {
+export async function scoreGuesses(guesses: Map<PlayerId, string>, vocab?: Vocab): Promise<ScoringResult> {
   const scores = new Map<PlayerId, number>()
   const positions = new Map<PlayerId, [number, number]>()
   const entries = [...guesses.entries()].filter(([, g]) => g.trim().length > 0)
 
-  if (entries.length === 0) return { scores, positions }
+  if (entries.length === 0) return { scores, positions, centroidWord: '' }
 
   if (entries.length === 1) {
     scores.set(entries[0][0], config.BASE_MAX_SCORE)
@@ -76,12 +78,14 @@ export async function scoreGuesses(guesses: Map<PlayerId, string>): Promise<Scor
     for (const [id] of guesses) {
       if (!scores.has(id)) scores.set(id, 0)
     }
-    return { scores, positions }
+    return { scores, positions, centroidWord: entries[0][1].trim().toLowerCase() }
   }
 
   const normalized = entries.map(([id, g]) => [id, g.trim().toLowerCase()] as const)
   const embeddings = await fetchEmbeddings(normalized.map(([, g]) => g))
   const cent = centroid(embeddings)
+
+  const centroidWord = vocab ? nearestWord(cent, vocab) : ''
 
   for (let i = 0; i < normalized.length; i++) {
     const [id] = normalized[i]
@@ -98,5 +102,5 @@ export async function scoreGuesses(guesses: Map<PlayerId, string>): Promise<Scor
     if (!scores.has(id)) scores.set(id, 0)
   }
 
-  return { scores, positions }
+  return { scores, positions, centroidWord }
 }

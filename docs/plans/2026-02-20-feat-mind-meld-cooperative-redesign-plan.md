@@ -355,14 +355,14 @@ and prompt repetition filtering. Update game config.
 
 #### Acceptance Criteria
 
-- [ ] `ScoringResult` includes `centroidWord: string`
-- [ ] `scoreGuesses()` accepts `vocab` param and returns centroidWord
-- [ ] `filterPromptRepetitions()` correctly filters prompt-matching guesses
-- [ ] `detectMeld()` correctly detects when all stemmed submissions match
-- [ ] Config updated: `MAX_ROUNDS=20`, `GUESS_SECS=10`, `REVEAL_SECS=3`
-- [ ] All references to old constant names updated
-- [ ] All tests pass (`bun test`)
-- [ ] Project compiles (`bun run build` or `bunx tsc --noEmit`)
+- [x] `ScoringResult` includes `centroidWord: string`
+- [x] `scoreGuesses()` accepts `vocab` param and returns centroidWord
+- [x] `filterPromptRepetitions()` correctly filters prompt-matching guesses
+- [x] `detectMeld()` correctly detects when all stemmed submissions match
+- [x] Config updated: `MAX_ROUNDS=20`, `GUESS_SECS=10`, `REVEAL_SECS=3`
+- [x] All references to old constant names updated
+- [x] All tests pass (`bun test`)
+- [x] Project compiles (`bun run build` or `bunx tsc --noEmit`)
 
 #### Phase 2 → Phase 3 Bridge: Vocab Parameter
 

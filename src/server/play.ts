@@ -4,19 +4,9 @@ import * as t from './types'
 import * as util from './util'
 import * as scoring from './scoring'
 
-function shuffle<T>(array: T[]): T[] {
-  const result = [...array]
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]]
-  }
-  return result
-}
-
-function fillQueue(queue: number[], difficulty: 'easy' | 'medium' | 'hard', allCategories: t.Category[]): void {
-  const matching = allCategories.filter(c => c.difficulty === difficulty)
-  const shuffled = shuffle(matching.map(c => c.id))
-  queue.push(...shuffled)
+function pickRandomPrompt(categories: t.Category[]): string {
+  const idx = Math.floor(Math.random() * categories.length)
+  return categories[idx].prompt
 }
 
 export function startTicking(
@@ -53,18 +43,6 @@ function newGuessPhase(round: number, category: string): t.Phase {
   }
 }
 
-function pickCategory(round: number, game: t.Game, allCategories: t.Category[]): string {
-  const difficulty = config.DIFFICULTY_SCHEDULE[round]
-  const queue = game.categoryQueues[difficulty]
-
-  if (queue.length === 0) {
-    fillQueue(queue, difficulty, allCategories)
-  }
-
-  const categoryId = queue.shift()!
-  const category = allCategories.find(c => c.id === categoryId)!
-  return category.prompt
-}
 
 export function onTickGame(gameId: t.GameId, game: t.Game, timeSecs: number, deltaSecs: number, categories: t.Category[]) {
   const phase = game.phase
@@ -75,7 +53,7 @@ export function onTickGame(gameId: t.GameId, game: t.Game, timeSecs: number, del
       phase.secsLeft = Math.max(0, phase.secsLeft - deltaSecs)
 
       if (phase.secsLeft === 0) {
-        const category = pickCategory(0, game, categories)
+        const category = pickRandomPrompt(categories)
         game.phase = newGuessPhase(0, category)
         game.broadcast(currentGameState(gameId, game))
       }
@@ -303,7 +281,7 @@ async function scoreRound(gameId: t.GameId, game: t.Game) {
     type: 'SCORES',
     round,
     category,
-    secsLeft: config.SCORE_SECS,
+    secsLeft: config.REVEAL_SECS,
     isReady: new Set(),
     scores,
     positions,
@@ -330,10 +308,10 @@ function goToNextRound(gameId: t.GameId, game: t.Game, categories: t.Category[])
 
   const round = game.phase.round + 1
 
-  if (round === config.ROUNDS_PER_GAME) {
+  if (round === config.MAX_ROUNDS) {
     game.phase = { type: 'LOBBY', secsLeft: undefined, isReady: new Set }
   } else {
-    const category = pickCategory(round, game, categories)
+    const category = pickRandomPrompt(categories)
     game.phase = newGuessPhase(round, category)
   }
 
@@ -365,7 +343,7 @@ export function currentGameState(gameId: t.GameId, game: t.Game): t.ToClientMess
         hasGuessed: game.players.map(info => [info.id, phase.guesses.has(info.id)]),
         secsLeft: phase.secsLeft,
         round: phase.round,
-        totalRounds: config.ROUNDS_PER_GAME,
+        totalRounds: config.MAX_ROUNDS,
       }
     }
     case 'SCORES': {
@@ -380,7 +358,7 @@ export function currentGameState(gameId: t.GameId, game: t.Game): t.ToClientMess
         isReady: game.players.map(info => [info.id, phase.isReady.has(info.id)]),
         secsLeft: phase.secsLeft,
         round: phase.round,
-        totalRounds: config.ROUNDS_PER_GAME,
+        totalRounds: config.MAX_ROUNDS,
       }
     }
   }

@@ -1,11 +1,8 @@
-export const ROUNDS_PER_GAME = 10
+export const MAX_ROUNDS = 20
 export const LOBBY_COUNTDOWN_SECS = 3
-export const GUESS_SECS = 25
-export const SCORE_SECS = 25
-export const DIFFICULTY_SCHEDULE: ('easy' | 'medium' | 'hard') [] = [
-    'easy', 'easy', 'medium', 'easy', 'medium',
-    'hard', 'easy', 'medium', 'hard', 'medium',
-]
+export const GUESS_SECS = 10
+export const REVEAL_SECS = 3
+export const MAX_SCORING_RETRIES = 3
 export const BASE_MAX_SCORE = 10
 export const SIMILARITY_FLOOR = 0.5
 export const EMBEDDING_MODEL = 'nomic-embed-text'
