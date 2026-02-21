@@ -1,3 +1,4 @@
+import * as React from 'react'
 import * as t from './types'
 import { Box } from './mail'
 import { Timer } from './components/timer'
@@ -22,6 +23,8 @@ type Props = {
 }
 
 export function Reveal({ gameId, playerId, playerName, mailbox, centroidWord, centroidIsRepeat, positions, guesses, melded, round, totalRounds, secsLeft, isReady, otherPlayers }: Props) {
+  const totalDuration = React.useRef(secsLeft).current
+
   const nameOf = new Map(otherPlayers.map(([id, name]) => [id, name]))
   nameOf.set(playerId, playerName)
 
@@ -41,7 +44,7 @@ export function Reveal({ gameId, playerId, playerName, mailbox, centroidWord, ce
       <div className="screen-topbar">
         <span />
         {secsLeft !== undefined
-          ? <div className="timer" style={{ '--timer-duration': `${secsLeft}s` } as React.CSSProperties}>
+          ? <div className="timer" style={{ '--timer-duration': `${totalDuration}s` } as React.CSSProperties}>
               <svg viewBox="0 0 50 50">
                 <circle cx="25" cy="25" r="20" />
               </svg>

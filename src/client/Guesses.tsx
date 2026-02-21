@@ -70,6 +70,10 @@ type Props = {
 }
 
 export function Guesses({ mailbox, playerId, gameId, prompt, secsLeft, hasGuessed, round, totalRounds, scoring }: Props) {
+  // Capture initial secsLeft for CSS animation duration — re-renders with
+  // lower secsLeft values must NOT change the animation duration mid-flight.
+  const totalDuration = React.useRef(secsLeft).current
+
   function handleSubmit(guess: string) {
     mailbox.send({
       type: 'GUESS',
@@ -86,7 +90,7 @@ export function Guesses({ mailbox, playerId, gameId, prompt, secsLeft, hasGuesse
         {/*add leave function for btn-back and instructions popover button*/}
         {scoring
           ? <div className="timer scoring"><p>...</p></div>
-          : <div className="timer" style={{ '--timer-duration': `${secsLeft}s` } as React.CSSProperties}>
+          : <div className="timer" style={{ '--timer-duration': `${totalDuration}s` } as React.CSSProperties}>
               <svg viewBox="0 0 50 50">
                 <circle cx="25" cy="25" r="20" />
               </svg>

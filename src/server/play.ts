@@ -68,6 +68,7 @@ export function onTickGame(gameId: t.GameId, game: t.Game, timeSecs: number, del
       if (game.scoringInProgress) break
       phase.secsLeft = Math.max(0, phase.secsLeft - deltaSecs)
       if (phase.secsLeft === 0) {
+        game.broadcast(currentGameState(gameId, game))
         scoreRound(gameId, game, state)
       }
       break
