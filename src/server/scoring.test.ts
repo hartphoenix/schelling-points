@@ -41,7 +41,9 @@ describe('similarityToScore', () => {
 
   it('maps midpoint correctly', () => {
     const mid = (1 + config.SIMILARITY_FLOOR) / 2
-    expect(similarityToScore(mid)).toBe(Math.round(1 + (config.BASE_MAX_SCORE - 1) / 2))
+    const normalized = (mid - config.SIMILARITY_FLOOR) / (1 - config.SIMILARITY_FLOOR)
+    const curved = Math.pow(normalized, config.SCORE_CURVE_POWER)
+    expect(similarityToScore(mid)).toBe(Math.round(1 + curved * (config.BASE_MAX_SCORE - 1)))
   })
 })
 
