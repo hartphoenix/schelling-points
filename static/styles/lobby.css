@@ -6,8 +6,9 @@
     padding: 22px;
     border-radius: 20px;
     border: 1px solid  rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.06); 
-    max-height: 400px;
+    background: rgba(255, 255, 255, 0.06);
+    flex: 1;
+    min-height: 0;
     overflow-y: auto;
 }
 
@@ -59,6 +60,14 @@
     text-transform: uppercase;
 }
 
+.footer-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    width: 100%;
+}
+
 .btn-icon {
     background: none;
     color: inherit;
@@ -66,7 +75,22 @@
     padding: 0;
     cursor: pointer;
 }
+
+.footer-buttons .btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
 .icon {
+    width: 24px;
+    height: 24px;
     cursor: pointer;
     opacity: 0.8;
     transition: opacity 0.3s ease;

@@ -1,0 +1,57 @@
+.game-end .screen-header h1 {
+  font-size: 3rem;
+}
+
+.history-table {
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.history-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 16px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.history-header {
+  background: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0;
+}
+
+.history-header span {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.history-row span {
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-body);
+  color: var(--cream);
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+}
+
+.history-meld {
+  background: rgba(58, 187, 165, 0.15);
+  border: 1px solid var(--teal);
+}
+
+.history-meld-cell {
+  width: 100%;
+}
+
+.game-end .waiting-msg {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+}

@@ -4,7 +4,6 @@ import { Box } from './mail'
 import { MoodPicker } from './MoodPicker'
 import { PlayerRing } from './PlayerRing'
 import { InstructionsPopover } from './InstructionsPopover'
-import { playerColor } from './playerColor'
 
 type Props = {
   mailbox: Box
@@ -47,11 +46,13 @@ export function Lounge({ mailbox, playerId, mood, otherPlayers }: Props) {
           <span />
           <InstructionsPopover autoShow />
         </div>
-        <div className="title-block">
-          <h1 className="title">The Schelling Point</h1>
-          <p className="subtitle">Do you & your friends think alike?</p>
+        <div className="title-ring-group">
+          <PlayerRing />
+          <div className="title-block">
+            <h1 className="title">The Schelling Point</h1>
+            <p className="subtitle">Do you & your friends think alike?</p>
+          </div>
         </div>
-        <PlayerRing />
         <div className="screen-footer">
           <input className="input"
             type="text"
@@ -61,7 +62,7 @@ export function Lounge({ mailbox, playerId, mood, otherPlayers }: Props) {
             onChange={e => setPlayerName(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleJoin()}
           />
-          <button className="btn" onClick={handleJoin}>Join Lounge</button>
+          <button className="btn" onClick={handleJoin}>Join Lobby</button>
         </div>
       </div>
     )
@@ -81,7 +82,7 @@ export function Lounge({ mailbox, playerId, mood, otherPlayers }: Props) {
       </div>
       <PlayerRing players={otherPlayers} />
       <div className="screen-footer">
-        <p>{otherPlayers.length + 1} players joined</p>
+        <p>{otherPlayers.length} players joined</p>
         <MoodPicker currentMood={currentMood} onSelect={handleMoodChange} />
         <button className="btn" onClick={handleNewGame}>New Game</button>
       </div>

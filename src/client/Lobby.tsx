@@ -7,7 +7,6 @@ import { Timer } from './components/timer'
 import { PlayerRing } from './PlayerRing'
 import { MoodPicker } from './MoodPicker'
 import { InstructionsPopover } from './InstructionsPopover'
-import { playerColor } from './playerColor'
 
 type Props = {
   mailbox: Box
@@ -40,7 +39,7 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, mood, play
     const gameUrl = `${window.location.origin}/game/${id}`
     return (<>
       <button className="btn-icon" popoverTarget="qr-popover">
-        <svg className="icon" width="18" height="18" viewBox="0 0 24 24"
+        <svg className="icon" viewBox="0 0 24 24"
           fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
           strokeLinejoin="round">
           <rect x="2" y="2" width="8" height="8" rx="1"/>
@@ -71,8 +70,8 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, mood, play
     const gameUrl = `${window.location.origin}/game/${id}`
     return (<>
       <button className="btn-icon" popoverTarget="copy-popover" onClick={() => navigator.clipboard.writeText(gameUrl)}>
-        <svg className="icon" width="18" height="18" viewBox="0 0 24 24" fill="none"         
-          stroke="currentColor" strokeWidth="2" strokeLinecap="round"               
+        <svg className="icon" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" strokeWidth="2" strokeLinecap="round"
           strokeLinejoin="round">                                                    
           <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/>             
           <polyline points="16 6 12 2 8 6"/>                                
@@ -93,17 +92,18 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, mood, play
       </div>
       <div className="screen-header">
         <h1>Lobby</h1>
-        <h2>Your Game is: {gameId} 
-          {copyUrlButton(gameId)}
-          {qrCodeButton(gameId)}
-        </h2>
+        <h2>Your Game is: {gameId}</h2>
       </div>
       <PlayerRing players={otherPlayers} isReady={isReady} />
-      <p>{otherPlayers.length + 1} players joined</p>
-      {secsLeft !== undefined
-        && <p>Starting in <Timer secsLeft={secsLeft} />...</p>}
       <div className="screen-footer">
-        <MoodPicker currentMood={currentMood} onSelect={handleMoodChange} />
+        <p>{otherPlayers.length} players joined</p>
+        {secsLeft !== undefined
+          && <p>Starting in <Timer secsLeft={secsLeft} />...</p>}
+        <div className="footer-buttons">
+          {copyUrlButton(gameId)}
+          <MoodPicker currentMood={currentMood} onSelect={handleMoodChange} />
+          {qrCodeButton(gameId)}
+        </div>
         <button className="btn" onClick={handleToggleReady}>
           {isReady.find(([id]) => id === playerId)?.[1] ? 'Unready' : 'Ready'}
         </button>
