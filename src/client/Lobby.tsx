@@ -96,10 +96,10 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, mood, play
         <h2>Your Game is: {gameId}</h2>
       </div>
       <PlayerRing players={otherPlayers} isReady={isReady} />
-      <p>{otherPlayers.length + 1} players joined</p>
-      {secsLeft !== undefined
-        && <p>Starting in <Timer secsLeft={secsLeft} />...</p>}
       <div className="screen-footer">
+        <p>{otherPlayers.length} players joined</p>
+        {secsLeft !== undefined
+          && <p>Starting in <Timer secsLeft={secsLeft} />...</p>}
         <div className="footer-buttons">
           {copyUrlButton(gameId)}
           <MoodPicker currentMood={currentMood} onSelect={handleMoodChange} />
