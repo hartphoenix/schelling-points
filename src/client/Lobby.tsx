@@ -4,6 +4,7 @@ import { Box } from './mail'
 import type { JSX } from 'react'
 import { QRCode } from 'react-qrcode-logo'
 import { Timer } from './components/timer'
+import { PlayerRing } from './PlayerRing'
 import { MoodPicker } from './MoodPicker'
 import { InstructionsPopover } from './InstructionsPopover'
 import { playerColor } from './playerColor'
@@ -20,10 +21,6 @@ type Props = {
 }
 
 export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, mood, playerName, otherPlayers }: Props) {
-  // Build a name lookup from otherPlayers
-  const nameOf = new Map(otherPlayers.map(([id, name]) => [id, name]))
-  const moodOf = new Map(otherPlayers.map(([id, name, mood]) => [id, mood]))
-
   const [currentMood, setCurrentMood] = React.useState(mood)
 
   function handleMoodChange(newMood: t.Mood) {
@@ -98,17 +95,8 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, mood, play
           {qrCodeButton(gameId)}
         </h2>
       </div>
-      <div className="players-joined">
-        {isReady.filter(([id, ready]) => ready).map(([id]) =>
-          <div className="avatar-wrapper" key={id}>
-            <div className="player-avatar" style={{background:
-            `var(${playerColor(id).primary})`}}>
-              {nameOf.get(id)?.charAt(0)}
-        </div>
-              <span className="avatar-mood">{moodOf.get(id)}</span>
-            </div>
-        )}
-      </div>
+      <PlayerRing players={otherPlayers} isReady={isReady} />
+      <p>{otherPlayers.length + 1} players joined</p>
       {secsLeft !== undefined
         && <p>Starting in <Timer secsLeft={secsLeft} />...</p>}
       <div className="screen-footer">
