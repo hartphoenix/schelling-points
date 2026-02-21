@@ -40,7 +40,7 @@ export function ScatterPlot({ positions, playerId, nameOf, guesses }: {
             <text x={svgX} y={svgY - 10}
               fontSize={11} fill="var(--cream)" textAnchor="middle"
               fontFamily="DM Sans, sans-serif" fontWeight={700}
-              letterSpacing="0.1em">
+              letterSpacing="0.1em" opacity="0" >
               {label.toUpperCase()}
             </text>
           </g>

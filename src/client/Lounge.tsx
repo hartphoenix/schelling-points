@@ -71,7 +71,7 @@ export function Lounge({ mailbox, playerId, mood, otherPlayers }: Props) {
   return (
     <div className="screen lounge">
       <div className="screen-topbar">
-        <button className="btn-back">‹</button>
+        <div> </div>
         <InstructionsPopover />
       </div>
       <div className="screen-header">

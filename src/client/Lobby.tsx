@@ -42,12 +42,12 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, mood, play
         <svg className="icon" viewBox="0 0 24 24"
           fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
           strokeLinejoin="round">
-          <rect x="2" y="2" width="8" height="8" rx="1"/>
-          <rect x="14" y="2" width="8" height="8" rx="1"/>
-          <rect x="2" y="14" width="8" height="8" rx="1"/>
-          <rect x="14" y="14" width="4" height="4" rx="1"/>
-          <line x1="22" y1="14" x2="22" y2="18"/>
-          <line x1="18" y1="22" x2="22" y2="22"/>
+          <rect x="2" y="2" width="8" height="8" rx="1" />
+          <rect x="14" y="2" width="8" height="8" rx="1" />
+          <rect x="2" y="14" width="8" height="8" rx="1" />
+          <rect x="14" y="14" width="4" height="4" rx="1" />
+          <line x1="22" y1="14" x2="22" y2="18" />
+          <line x1="18" y1="22" x2="22" y2="22" />
         </svg>
       </button>
       <div id="qr-popover" popover="auto">
@@ -72,10 +72,10 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, mood, play
       <button className="btn-icon" popoverTarget="copy-popover" onClick={() => navigator.clipboard.writeText(gameUrl)}>
         <svg className="icon" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" strokeWidth="2" strokeLinecap="round"
-          strokeLinejoin="round">                                                    
-          <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/>             
-          <polyline points="16 6 12 2 8 6"/>                                
-          <line x1="12" y1="2" x2="12" y2="15"/>
+          strokeLinejoin="round">
+          <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7" />
+          <polyline points="16 6 12 2 8 6" />
+          <line x1="12" y1="2" x2="12" y2="15" />
         </svg>
       </button>
       <div id="copy-popover" popover="auto">
@@ -87,7 +87,7 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, mood, play
   return (
     <div className="screen lobby">
       <div className="screen-topbar">
-        <button className="btn-back">‹</button>
+        <div> </div>
         <InstructionsPopover autoShow={!localStorage.getItem('schelling-instructions-seen')} />
       </div>
       <div className="screen-header">
