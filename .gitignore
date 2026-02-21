@@ -9,3 +9,6 @@ scoring-sandbox/dist/
 
 # Ephemeral agent working files (local only)
 .claude/todos/
+
+# Built vocab embeddings (large, generated locally)
+data/vocab-embeddings.json

@@ -57,18 +57,27 @@ describe('scoreGuesses', () => {
     const result = await scoreGuesses(new Map())
     expect(result.scores.size).toBe(0)
     expect(result.positions.size).toBe(0)
+    expect(result.centroidWord).toBe('')
   })
 
   it('returns empty when all guesses are whitespace', async () => {
     const result = await scoreGuesses(new Map([['p1', '  '], ['p2', '']]))
     expect(result.scores.size).toBe(0)
     expect(result.positions.size).toBe(0)
+    expect(result.centroidWord).toBe('')
   })
 
   it('gives single player BASE_MAX_SCORE at center position', async () => {
     const result = await scoreGuesses(new Map([['p1', 'hello']]))
     expect(result.scores.get('p1')).toBe(config.BASE_MAX_SCORE)
     expect(result.positions.get('p1')).toEqual([0, 0])
+    expect(result.centroidWord).toBe('hello')
+  })
+
+  it('returns empty centroidWord when no vocab provided', async () => {
+    mockFetch([[1, 0, 0], [1, 0, 0]])
+    const result = await scoreGuesses(new Map([['p1', 'cat'], ['p2', 'dog']]))
+    expect(result.centroidWord).toBe('')
   })
 
   it('gives non-submitter score 0 with no position', async () => {

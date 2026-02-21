@@ -2,6 +2,7 @@ import WebSocket from 'ws'
 export * from '../types'
 import * as names from './names'
 import * as t from '../types'
+import type { Vocab } from './vocab'
 
 export interface PlayerInfo {
   id: t.PlayerId,
@@ -18,12 +19,13 @@ export interface Category {
 }
 
 export type Phase =
-  | { type: 'LOBBY', secsLeft?: number, isReady: Set<t.PlayerId>, }
-  | { type: 'GUESSES', round: number, category: string, secsLeft: number, guesses: Map<t.PlayerId, string> }
-  | { type: 'SCORES', round: number, category: string, isReady: Set<t.PlayerId>, secsLeft: number, scores: Map<t.PlayerId, number>, positions: Map<t.PlayerId, [number, number]>, guesses: Map<t.PlayerId, string> }
+  | { type: 'LOBBY', secsLeft?: number, isReady: Set<t.PlayerId> }
+  | { type: 'GUESSES', round: number, prompt: string, secsLeft: number, guesses: Map<t.PlayerId, string> }
+  | { type: 'REVEAL', round: number, prompt: string, isReady: Set<t.PlayerId>, secsLeft: number, scores: Map<t.PlayerId, number>, positions: Map<t.PlayerId, [number, number]>, guesses: Map<t.PlayerId, string>, centroidWord: string, melded: boolean }
+  | { type: 'CONTINUE', isLeaving: Set<t.PlayerId>, isContinuing: Set<t.PlayerId> }
 
 export interface RoundScore {
-  category: string;
+  prompt: string;
   guessesAndScores: [t.PlayerId, string, number][],
 }
 
@@ -32,11 +34,9 @@ export class Game {
   phase: Phase = { type: 'LOBBY', isReady: new Set() }
   previousScores: RoundScore[] = []
   scoringInProgress = false
-  categoryQueues: Record<'easy' | 'medium' | 'hard', number[]> = {
-    easy: [],
-    medium: [],
-    hard: [],
-  }
+  centroidHistory: string[] = []
+  currentPrompt = ''
+  scoringRetries = 0
 
   unicast(playerId: t.PlayerId, message: t.ToClientMessage) {
     const player = this.players.find(info => info.id === playerId)
@@ -77,12 +77,14 @@ export class State {
   lounge: Map<t.PlayerId, LoungeInfo>
   games: Map<t.GameId, Game>
   categories: Category[]
+  vocab: Vocab
 
-  constructor(nameChooser: names.Chooser, categories: Category[]) {
+  constructor(nameChooser: names.Chooser, categories: Category[], vocab: Vocab) {
     this.nameChooser = nameChooser
     this.lounge = new Map
     this.games = new Map
     this.categories = categories
+    this.vocab = vocab
   }
 
   broadcastToLounge(message: t.ToClientMessage) {
