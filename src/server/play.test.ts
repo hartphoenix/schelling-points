@@ -8,6 +8,8 @@ function mockWs(readyState = WebSocket.OPEN): WebSocket {
   return { readyState, send: vi.fn() } as unknown as WebSocket
 }
 
+const stubVocab = { words: ['cat', 'dog'], vectors: [[1], [0]] }
+
 function makeGame(players: { id: string, ws?: WebSocket }[]): t.Game {
   const game = new t.Game()
   for (const p of players) {
@@ -22,11 +24,25 @@ function makeGame(players: { id: string, ws?: WebSocket }[]): t.Game {
   return game
 }
 
+function makeState(games?: [string, t.Game][]): t.State {
+  const state = new t.State(
+    { choose: () => 'test' } as any,
+    categories,
+    stubVocab,
+  )
+  if (games) {
+    for (const [id, game] of games) {
+      state.games.set(id, game)
+    }
+  }
+  return state
+}
+
 function guessPhase(guesses: [string, string][] = []): t.Phase {
   const phase: t.Phase = {
     type: 'GUESSES',
     round: 0,
-    category: 'animals',
+    prompt: 'animals',
     secsLeft: 10,
     guesses: new Map(guesses),
   }
@@ -36,6 +52,7 @@ function guessPhase(guesses: [string, string][] = []): t.Phase {
 const stubScoring: scoring.ScoringResult = {
   scores: new Map([['a', 8], ['b', 6]]),
   positions: new Map([['a', [0.1, 0.2]], ['b', [-0.1, -0.2]]]),
+  centroidWord: 'cat',
 }
 
 vi.spyOn(scoring, 'scoreGuesses').mockResolvedValue(stubScoring)
@@ -45,25 +62,27 @@ const categories: t.Category[] = [
 ]
 
 describe('scoreRound via timer', () => {
-  it('transitions to SCORES when timer hits 0', async () => {
+  it('transitions to REVEAL when timer hits 0', async () => {
     const game = makeGame([{ id: 'a' }, { id: 'b' }])
+    game.currentPrompt = 'animals'
     game.phase = guessPhase([['a', 'cat'], ['b', 'dog']])
     ;(game.phase as any).secsLeft = 0
 
-    onTickGame('test-game', game, 0, 1, categories)
+    const state = makeState([['test-game', game]])
+    onTickGame('test-game', game, 0, 1, state)
 
     // scoreRound is async — wait for it
     await new Promise(r => setTimeout(r, 10))
 
-    expect(game.phase.type).toBe('SCORES')
+    expect(game.phase.type).toBe('REVEAL')
     expect(game.scoringInProgress).toBe(false)
-    if (game.phase.type === 'SCORES') {
+    if (game.phase.type === 'REVEAL') {
       expect(game.phase.scores.get('a')).toBe(8)
       expect(game.phase.scores.get('b')).toBe(6)
       expect(game.phase.guesses.get('a')).toBe('cat')
     }
     expect(game.previousScores).toHaveLength(1)
-    expect(game.previousScores[0].category).toBe('animals')
+    expect(game.previousScores[0].prompt).toBe('animals')
     expect(game.players[0].previousScoresAndGuesses).toEqual([[8, 'cat']])
     expect(game.players[1].previousScoresAndGuesses).toEqual([[6, 'dog']])
   })
@@ -72,13 +91,10 @@ describe('scoreRound via timer', () => {
 describe('scoreRound via all guesses submitted', () => {
   it('scores immediately when all live players have guessed', async () => {
     const game = makeGame([{ id: 'a' }, { id: 'b' }])
+    game.currentPrompt = 'animals'
     game.phase = guessPhase([['a', 'cat']])
 
-    const state = new t.State(
-      { choose: () => 'test' } as any,
-      categories,
-    )
-    state.games.set('test-game', game)
+    const state = makeState([['test-game', game]])
 
     onClientMessage(state, {
       type: 'GUESS',
@@ -89,8 +105,8 @@ describe('scoreRound via all guesses submitted', () => {
 
     await new Promise(r => setTimeout(r, 10))
 
-    expect(game.phase.type).toBe('SCORES')
-    if (game.phase.type === 'SCORES') {
+    expect(game.phase.type).toBe('REVEAL')
+    if (game.phase.type === 'REVEAL') {
       expect(game.phase.scores.get('a')).toBe(8)
       expect(game.phase.guesses.get('b')).toBe('dog')
     }
@@ -100,11 +116,7 @@ describe('scoreRound via all guesses submitted', () => {
     const game = makeGame([{ id: 'a' }, { id: 'b' }, { id: 'c' }])
     game.phase = guessPhase()
 
-    const state = new t.State(
-      { choose: () => 'test' } as any,
-      categories,
-    )
-    state.games.set('test-game', game)
+    const state = makeState([['test-game', game]])
 
     onClientMessage(state, {
       type: 'GUESS',
@@ -119,13 +131,10 @@ describe('scoreRound via all guesses submitted', () => {
   it('ignores disconnected players for all-guessed check', async () => {
     const closedWs = mockWs(WebSocket.CLOSED)
     const game = makeGame([{ id: 'a' }, { id: 'b' }, { id: 'c', ws: closedWs }])
+    game.currentPrompt = 'animals'
     game.phase = guessPhase([['a', 'cat']])
 
-    const state = new t.State(
-      { choose: () => 'test' } as any,
-      categories,
-    )
-    state.games.set('test-game', game)
+    const state = makeState([['test-game', game]])
 
     onClientMessage(state, {
       type: 'GUESS',
@@ -136,6 +145,6 @@ describe('scoreRound via all guesses submitted', () => {
 
     await new Promise(r => setTimeout(r, 10))
 
-    expect(game.phase.type).toBe('SCORES')
+    expect(game.phase.type).toBe('REVEAL')
   })
 })
