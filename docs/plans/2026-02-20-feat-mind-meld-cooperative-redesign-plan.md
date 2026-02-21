@@ -757,18 +757,18 @@ This also enables `endGame` (3e) to access `state.lounge` and
 
 #### Acceptance Criteria
 
-- [ ] Project compiles with all new types
-- [ ] Round cycling works: LOBBY → GUESSES → REVEAL → GUESSES → ...
-- [ ] Centroid word becomes next round's prompt
-- [ ] Meld detected → REVEAL plays → GAME_END unicast → LOBBY
-- [ ] Round 20 without meld → GAME_END (Phase 4 changes this to CONTINUE)
-- [ ] Scoring failure → retry same prompt, same round number
-- [ ] Zero valid submissions → same as scoring failure
-- [ ] `centroidHistory` tracks all centroid words
-- [ ] `GAME_END` includes per-player history
-- [ ] `centroidIsRepeat` correctly flags repeat words
-- [ ] Old `SCORE_STATE` / `SCORES_READY` fully removed
-- [ ] All tests pass
+- [x] Project compiles with all new types
+- [x] Round cycling works: LOBBY → GUESSES → REVEAL → GUESSES → ...
+- [x] Centroid word becomes next round's prompt
+- [x] Meld detected → REVEAL plays → GAME_END unicast → LOBBY
+- [x] Round 20 without meld → GAME_END (Phase 4 changes this to CONTINUE)
+- [x] Scoring failure → retry same prompt, same round number
+- [x] Zero valid submissions → same as scoring failure
+- [x] `centroidHistory` tracks all centroid words
+- [x] `GAME_END` includes per-player history
+- [x] `centroidIsRepeat` correctly flags repeat words
+- [x] Old `SCORE_STATE` / `SCORES_READY` fully removed
+- [x] All tests pass
 
 #### Agent Instructions
 
