@@ -17,7 +17,9 @@ export function Lounge({ mailbox, playerId, mood, otherPlayers }: Props) {
   const savedName = localStorage.getItem('playerName') ?? ''
   const [playerName, setPlayerName] = React.useState(savedName)
   const [joined, setJoined] = React.useState(false)
-  const [currentMood, setCurrentMood] = React.useState(mood)
+  const [currentMood, setCurrentMood] = React.useState(
+    (localStorage.getItem('mood') as t.Mood) ?? mood
+  )
 
   function handleJoin() {
     if (!playerName.trim()) return
