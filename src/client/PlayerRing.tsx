@@ -1,5 +1,6 @@
 import * as React from 'react'
 import * as t from './types'
+import { playerColor } from './playerColor'
 
 type Props = {
   players?: [t.PlayerId, t.PlayerName, t.Mood][]
@@ -44,9 +45,9 @@ export function PlayerRing({ players, isReady }: Props) {
 
   function renderPlayerNode(
     [id, name, mood]: [t.PlayerId, t.PlayerName, t.Mood],
-    posInRing: number, totalInRing: number, ringIndex: number, colorIndex: number
+    posInRing: number, totalInRing: number, ringIndex: number,
   ) {
-    const color = `var(${COLORS[colorIndex % COLORS.length]})`
+    const color = `var(${playerColor(id).primary})`
     const ready = readySet.has(id)
     const isNew = !previousPlayerIds.current.has(id)
     const classes = [
@@ -83,10 +84,9 @@ export function PlayerRing({ players, isReady }: Props) {
       <div className="ring">
         {players
           ? buckets.map((bucket, ringIndex) =>
-              bucket.map((player, posInRing) => {
-                const playerIndex = posInRing * 4 + ringIndex
-                return renderPlayerNode(player, posInRing, bucket.length, ringIndex, playerIndex)
-              })
+              bucket.map((player, posInRing) =>
+                renderPlayerNode(player, posInRing, bucket.length, ringIndex)
+              )
             )
           : decorativeBuckets.map((bucket, ringIndex) =>
               bucket.map((dot, posInRing) => (

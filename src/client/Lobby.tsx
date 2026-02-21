@@ -7,7 +7,6 @@ import { Timer } from './components/timer'
 import { PlayerRing } from './PlayerRing'
 import { MoodPicker } from './MoodPicker'
 import { InstructionsPopover } from './InstructionsPopover'
-import { playerColor } from './playerColor'
 
 type Props = {
   mailbox: Box

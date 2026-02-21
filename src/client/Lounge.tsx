@@ -4,7 +4,6 @@ import { Box } from './mail'
 import { MoodPicker } from './MoodPicker'
 import { PlayerRing } from './PlayerRing'
 import { InstructionsPopover } from './InstructionsPopover'
-import { playerColor } from './playerColor'
 
 type Props = {
   mailbox: Box

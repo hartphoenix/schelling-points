@@ -203,10 +203,24 @@ p {
     stroke-width: 2;
     stroke-dasharray: 125.6; /* circumference */
     stroke-dashoffset: 0;   /* 0 = full ring */
-    animation: countdown 25s linear forwards;
+    animation: countdown var(--timer-duration) linear forwards;
 }
 
 @keyframes countdown {
     from { stroke-dashoffset: 0; } /* 0 = full ring */
     to { stroke-dashoffset: -125.6; }
+}
+
+.timer.scoring {
+    animation: pulse-scoring 1s ease-in-out infinite;
+}
+
+.timer.scoring p {
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+}
+
+@keyframes pulse-scoring {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
 }

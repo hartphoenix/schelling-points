@@ -88,6 +88,11 @@ function onMessage(state: t.State, message: t.ToClientMessage): t.State {
       return { ...state, view: { type: 'LOBBY', gameId: message.gameId, isReady, secsLeft: message.secsLeft } }
     }
 
+    case 'SCORING': {
+      if (state.view.type !== 'GUESSES' || state.view.gameId !== message.gameId) return state
+      return { ...state, view: { ...state.view, scoring: true } }
+    }
+
     case 'NO_SUCH_GAME':
       // TODO: Create notification?
       return state
@@ -190,6 +195,7 @@ function App({ gameId }: Props) {
         hasGuessed={state.view.hasGuessed}
         round={state.view.round}
         totalRounds={state.view.totalRounds}
+        scoring={state.view.scoring}
       />
 
     case 'REVEAL':

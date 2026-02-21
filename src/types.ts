@@ -22,4 +22,5 @@ export type ToClientMessage =
   | { type: 'REVEAL_STATE', gameId: GameId, centroidWord: string, centroidIsRepeat: boolean, positions: [PlayerId, number, number][], guesses: [PlayerId, string][], melded: boolean, round: number, totalRounds: number, secsLeft: number, isReady: [PlayerId, boolean][] }
   | { type: 'GAME_END', gameId: GameId, melded: boolean, meldRound: number | null, centroidHistory: string[], playerHistory: [string, string][] }
   | { type: 'CONTINUE_PROMPT', gameId: GameId, centroidHistory: string[], playerHistory: [string, string][] }
+  | { type: 'SCORING', gameId: GameId }
   | { type: 'NO_SUCH_GAME', gameId: GameId }
