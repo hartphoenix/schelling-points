@@ -955,14 +955,14 @@ going or leave.
 
 #### Acceptance Criteria
 
-- [ ] Round 20 (no meld) → CONTINUE phase, CONTINUE_PROMPT sent
-- [ ] Player votes "Keep going" → tracked in `isContinuing`
-- [ ] Player votes "I'm out" → removed from game, returned to lounge
-- [ ] All voted + ≥2 continuing → round 21 starts
-- [ ] All voted + <2 continuing → GAME_END
-- [ ] Disconnect during CONTINUE → treated as leaving
-- [ ] Lounge updates when players leave game
-- [ ] No timer ticks during CONTINUE phase
+- [x] Round 20 (no meld) → CONTINUE phase, CONTINUE_PROMPT sent
+- [x] Player votes "Keep going" → tracked in `isContinuing`
+- [x] Player votes "I'm out" → removed from game, returned to lounge
+- [x] All voted + ≥2 continuing → round 21 starts
+- [x] All voted + <2 continuing → GAME_END
+- [x] Disconnect during CONTINUE → treated as leaving
+- [x] Lounge updates when players leave game
+- [x] No timer ticks during CONTINUE phase
 
 #### Agent Instructions
 

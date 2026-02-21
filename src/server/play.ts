@@ -272,7 +272,41 @@ export function onClientMessage(state: t.State, message: t.ToServerMessage, webS
     }
 
     case 'CONTINUE_VOTE': {
-      // Phase 4 implements this handler
+      const game = state.games.get(message.gameId)
+      if (!game || game.phase.type !== 'CONTINUE') break
+
+      if (message.continuePlay) {
+        game.phase.isContinuing.add(message.playerId)
+      } else {
+        game.phase.isLeaving.add(message.playerId)
+        // "I'm out" — move player from game to lounge
+        const player = game.players.find(p => p.id === message.playerId)
+        if (player) {
+          // 1. Remove from game.players
+          game.players = game.players.filter(p => p.id !== message.playerId)
+          // 2. Add to lounge
+          state.lounge.set(message.playerId, {
+            name: player.name,
+            mood: player.mood,
+            webSocket: player.webSocket,
+          })
+          // 3. Unicast LOUNGE to departing player (transitions their view)
+          // Send directly via captured socket — game.unicast won't find them after removal
+          const loungeMsg: t.ToClientMessage = {
+            type: 'LOUNGE',
+            loungingPlayers: [...state.lounge.entries()].map(
+              ([id, info]) => [id, info.name, info.mood]
+            ),
+          }
+          player.webSocket.send(JSON.stringify(loungeMsg))
+          // 4. Broadcast updates to lounge and remaining game players
+          state.broadcastLoungeChange()
+          game.broadcast(game.memberChangeMessage(message.gameId))
+        }
+      }
+
+      // Check if all remaining players have voted
+      checkContinueVotes(message.gameId, game, state)
       break
     }
   }
@@ -319,6 +353,34 @@ export function endGame(
 
   // 4. Broadcast lounge change (existing loungers see new players)
   state.broadcastLoungeChange()
+}
+
+export function checkContinueVotes(
+  gameId: t.GameId,
+  game: t.Game,
+  state: t.State,
+) {
+  if (game.phase.type !== 'CONTINUE') return
+
+  const liveIds = game.players
+    .filter(p => p.webSocket.readyState === WebSocket.OPEN)
+    .map(p => p.id)
+
+  // isLeaving players are already removed from game.players,
+  // so we only check isContinuing membership for remaining players.
+  const allVoted = liveIds.every(id => game.phase.type === 'CONTINUE' && game.phase.isContinuing.has(id))
+
+  if (allVoted && liveIds.length > 0) {
+    if (game.phase.isContinuing.size >= 2) {
+      // Continue — start round 21+ with last centroid as prompt
+      const nextRound = game.centroidHistory.length
+      game.phase = newGuessPhase(nextRound, game.currentPrompt)
+      game.broadcast(currentGameState(gameId, game))
+    } else {
+      // Not enough players — game ends
+      endGame(gameId, game, state, false)
+    }
+  }
 }
 
 async function scoreRound(gameId: t.GameId, game: t.Game, state: t.State) {
@@ -439,9 +501,20 @@ function goToNextRound(gameId: t.GameId, game: t.Game, state: t.State) {
   }
 
   if (round >= config.MAX_ROUNDS) {
-    // Round 20 without meld — end the game
-    // (Phase 4 changes this to enter CONTINUE phase)
-    endGame(gameId, game, state, false)
+    game.phase = {
+      type: 'CONTINUE',
+      isLeaving: new Set(),
+      isContinuing: new Set(),
+    }
+    // Unicast CONTINUE_PROMPT to each player (per-player history)
+    for (const player of game.players) {
+      game.unicast(player.id, {
+        type: 'CONTINUE_PROMPT',
+        gameId,
+        centroidHistory: [...game.centroidHistory],
+        playerHistory: buildPlayerHistory(player, game),
+      })
+    }
     return
   }
 

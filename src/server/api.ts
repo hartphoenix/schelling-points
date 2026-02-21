@@ -30,6 +30,19 @@ export function addWebsockets(state: t.State, app: express.Application) {
           state.lounge.delete(boundId)
           state.broadcastLoungeChange()
         }
+
+        // Handle disconnect during CONTINUE phase
+        for (const [gameId, game] of state.games) {
+          const playerIdx = game.players.findIndex(p => p.id === boundId)
+          if (playerIdx === -1) continue
+          if (game.phase.type === 'CONTINUE') {
+            game.players.splice(playerIdx, 1)
+            game.phase.isLeaving.add(boundId)
+            play.checkContinueVotes(gameId, game, state)
+          }
+          break
+        }
+
         socketOwner.delete(webSocket)
       }
     })
