@@ -6,6 +6,7 @@ import { Guesses } from "./client/Guesses"
 import { Lounge } from "./client/Lounge"
 import { Lobby } from "./client/Lobby"
 import { Scores } from "./client/Scores"
+import { ScreenBackground } from './client/ScreenBackground'
 import { PlayerRing } from "./client/PlayerRing"
 import { MoodPicker } from './client/MoodPicker'
 import '../static/styles/global.css'
@@ -15,6 +16,7 @@ import '../static/styles/guesses.css'
 import '../static/styles/scores.css'
 import '../static/styles/mood-picker.css'
 import '../static/styles/instructions.css'
+import '../static/styles/screen-background.css'
 import '../static/styles/radial-visualization.css'
 
 const router = Router.createBrowserRouter([
@@ -189,6 +191,7 @@ function App({ gameId }: Props) {
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
+    <ScreenBackground />
     <Router.RouterProvider router={router} />
   </React.StrictMode>
 )
