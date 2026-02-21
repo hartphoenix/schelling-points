@@ -1,12 +1,21 @@
-.title-block {
-    margin-top: 20px;
+.title-ring-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto 0;
+}
+
+.title-ring-group .title-block {
+    position: absolute;
+    text-align: center;
 }
 
 .title {
     font-family: var(--font-fancy);
     color: var(--cream);
     text-align: center;
-    font-size: 3rem;
+    font-size: 2.5rem;
     letter-spacing: 0.01em;
     margin-bottom: 10px;
 }
@@ -16,8 +25,7 @@
     color: rgba(255, 255, 255, 0.35);
     text-align: center;
     letter-spacing: .15em;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     font-weight: 300;
     text-transform: uppercase;
-    margin-bottom: 32px;
 }

@@ -1,6 +1,8 @@
 .ring-container{
     width: 340px;
-    height: 340px;
+    max-height: 340px;
+    aspect-ratio: 1;
+    margin: auto 0;
     position: relative;
 }
 
