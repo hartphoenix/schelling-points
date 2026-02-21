@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as t from './types'
 import { Box } from './mail'
+import { InstructionsPopover } from './InstructionsPopover'
 
 type BaseProps = {
   gameId: t.GameId
@@ -76,6 +77,10 @@ export function GameEnd(props: Props) {
   if (props.isContinue) {
     return (
       <div className="screen game-end">
+        <div className="screen-topbar">
+          <button className="btn-back" onClick={handleBackToLounge}>‹</button>
+          <InstructionsPopover />
+        </div>
         <div className="screen-header">
           <h1>Round 20 Reached</h1>
           <h2>Keep trying for a Mind Meld?</h2>
@@ -102,6 +107,10 @@ export function GameEnd(props: Props) {
 
   return (
     <div className="screen game-end">
+      <div className="screen-topbar">
+        <button className="btn-back" onClick={handleBackToLounge}>‹</button>
+        <InstructionsPopover />
+      </div>
       <div className="screen-header">
         {melded
           ? <>
