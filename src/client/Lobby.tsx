@@ -7,6 +7,7 @@ import { Timer } from './components/timer'
 import { PlayerRing } from './PlayerRing'
 import { MoodPicker } from './MoodPicker'
 import { InstructionsPopover } from './InstructionsPopover'
+import { playerColor } from './playerColor'
 
 type Props = {
   mailbox: Box
@@ -85,7 +86,7 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, mood, play
     <div className="screen lobby">
       <div className="screen-topbar">
         <button className="btn-back">‹</button>
-        <InstructionsPopover />
+        <InstructionsPopover autoShow={!localStorage.getItem('schelling-instructions-seen')} />
       </div>
       <div className="screen-header">
         <h1>Lobby</h1>

@@ -4,6 +4,7 @@ import { Box } from './mail'
 import { MoodPicker } from './MoodPicker'
 import { PlayerRing } from './PlayerRing'
 import { InstructionsPopover } from './InstructionsPopover'
+import { playerColor } from './playerColor'
 
 type Props = {
   mailbox: Box
@@ -31,6 +32,7 @@ export function Lounge({ mailbox, playerId, mood, otherPlayers }: Props) {
 
   function handleMoodChange(newMood: t.Mood) {
     setCurrentMood(newMood)
+    localStorage.setItem('mood', newMood)
     if (joined) {
       mailbox.send({ type: 'SET_PLAYER_INFO', playerId, playerName, mood: newMood })
     }
