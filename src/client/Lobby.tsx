@@ -21,10 +21,13 @@ type Props = {
 }
 
 export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, mood, playerName, otherPlayers }: Props) {
-  const [currentMood, setCurrentMood] = React.useState(mood)
+  const [currentMood, setCurrentMood] = React.useState(
+    (localStorage.getItem('mood') as t.Mood) ?? mood
+  )
 
   function handleMoodChange(newMood: t.Mood) {
     setCurrentMood(newMood)
+    localStorage.setItem('mood', newMood)
     mailbox.send({ type: 'SET_PLAYER_INFO', gameId, playerId, playerName, mood: newMood })
   }
 
