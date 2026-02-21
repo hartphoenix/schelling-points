@@ -37,15 +37,24 @@ function HistoryTable({ playerHistory, centroidHistory, meldRound }: {
         <span>You Said</span>
         <span>Center</span>
       </div>
-      {playerHistory.map(([guess, centroid], i) => (
-        <div
-          key={i}
-          className={`history-row ${meldRound != null && i === meldRound ? 'history-meld' : ''}`}
-        >
-          <span>{guess || '—'}</span>
-          <span>{centroid || '—'}</span>
-        </div>
-      ))}
+      {playerHistory.map(([guess, centroid], i) => {
+        const isMeld = meldRound != null && i === meldRound
+        return (
+          <div
+            key={i}
+            className={`history-row ${isMeld ? 'history-meld' : ''}`}
+          >
+            {isMeld ? (
+              <span className="history-meld-cell">{guess || '—'}</span>
+            ) : (
+              <>
+                <span>{guess || '—'}</span>
+                <span>{centroid || '—'}</span>
+              </>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }
