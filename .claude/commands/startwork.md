@@ -12,56 +12,40 @@ active work so the human can make an informed choice.
 
 ### 1. Gather
 
-Fetch all data needed for conflict detection and ranking.
+All data gathering is handled by a local script. Run:
 
-1. Pull latest main (`git pull origin main`)
-2. Fetch board items in Ready, Backlog, In Progress, and In Review
-   (`gh project item-list 1 --owner thrialectics --format json`)
-3. Fetch open PRs
-   (`gh pr list --json number,title,headRefName,files,author`)
-4. Scan `.claude/todos/agent/` for stale working files (created >24h
-   ago) and surface them for verification
-5. Classify fetched items:
-   - **Candidates** — items in Ready and Backlog (these get ranked)
-   - **Active work** — items in In Progress and In Review, plus open
-     PRs (reference data for conflict detection)
+```
+git pull origin main && bun .claude/scripts/startwork-gather.ts
+```
 
-If GitHub is unreachable, warn and continue from local branch state.
-If a query partially fails (e.g., PR fetch succeeds but board fails),
-warn which data source is missing and proceed with available data —
-note that conflict detection may be incomplete.
+The script outputs a single JSON object with:
+- `activeWork` — items In Progress, In Review, and open PRs
+- `candidates` — items in Ready and Backlog, each with pre-computed
+  `dependencies` (resolved or not) and `flags` (dependency, decision,
+  external)
+- `staleTodos` — agent todo files older than 24h
+- `warnings` — any data sources that failed
 
-If there are no candidates in Ready or Backlog, say so and stop.
+If the script fails entirely, warn and stop.
+
+If there are no candidates, say so and stop.
+
+If `staleTodos` is non-empty, surface them for verification.
 
 ### 2. Detect
 
-Check each candidate against active work for blocking conditions.
-When `/startwork #N` is provided, run Detect only on the specified
-issue. Otherwise, check all candidates.
+The script pre-computes structural flags (dependency, decision,
+external) from labels and `### Dependencies` sections. You only need
+to add **semantic conflict detection**:
 
-For each candidate, check for these conditions:
+For each candidate, check against `activeWork.inProgress` and
+`activeWork.openPRs`:
 
 | Type | Definition | How to detect |
 |------|-----------|---------------|
-| dependency | Upstream issue this task depends on is still open | Parse candidate's `### Dependencies` section for `Depends on #N`; check if #N is still open |
-| conflict | Another PR or In Progress task overlaps in scope | See overlap detection below |
-| decision | Unresolved `human-decision` issue that this task presupposes | Search open issues with `human-decision` label; flag if candidate's scope overlaps |
-| review | An upstream PR referenced in dependencies is not yet merged | Parse candidate's `### Dependencies` for PR references; check if still open |
-| external | Blocker outside team control | Check candidate's labels for `blocked`; check body for external dependency mentions |
+| conflict | Another PR or In Progress task overlaps in scope | Compare titles/descriptions for overlapping scope. Flag as "possible conflict" with low confidence. If open PRs have file lists, check for file overlap with the candidate's likely files. |
 
-**Distinguishing `dependency` from `review`:** `dependency` = an open
-*issue* (work not yet done). `review` = an open *PR* (work done, not
-yet merged). Both can appear on the same candidate.
-
-**Overlap detection for `conflict`** — use a layered approach:
-
-1. **PR files** — an open PR's changed files overlap with files the
-   candidate likely touches (from description or related PRs)
-2. **Semantic** — titles or descriptions suggest overlapping scope
-   (flag as "possible conflict" — prefer file-based signals)
-
-Output: a per-candidate list of flags, each with type, related
-issue/PR number, assignee (if any), and a brief description.
+Append any conflict flags to the candidate's existing `flags` array.
 
 ### 3. Rank
 
@@ -73,16 +57,16 @@ tier, prefer items that also rank well in lower tiers.
    of assignee
 2. **Assigned to current user** — user's tasks above unassigned or
    others' work
-3. **Unblocks other work** — items referenced in another issue's
-   `### Dependencies` section surface higher; check for issues with
-   the `blocked` label that reference these items
+3. **Unblocks other work** — check if any issue in the full candidate
+   or active work list has a dependency on this candidate (i.e., this
+   candidate's number appears in another issue's `dependencies` array)
 4. **MVP-critical path** — foundational structure the product needs
    (core game loop, essential UI flows, shared infrastructure) above
    nice-to-have improvements
 
-**Then demote:** Any candidate with one or more flags from Detect
-ranks below all clean (unflagged) candidates at the same priority
-tier. Within the demoted group, preserve the original tier ordering.
+**Then demote:** Any candidate with one or more flags ranks below all
+clean (unflagged) candidates at the same priority tier. Within the
+demoted group, preserve the original tier ordering.
 
 If a specific issue was provided via `/startwork #N`, skip ranking
 and proceed directly to Present (step 4) to show its flags.
@@ -92,17 +76,16 @@ and proceed directly to Present (step 4) to show its flags.
 Show the top candidates as an ordered list. For each item, show:
 
 - Why it ranks where it does (tier + assignment)
-- Any flags from Detect, one line per flag with link:
+- Any flags, one line per flag with link:
 
 ```
 [conflict] #42 (In Progress, Ulysse) — overlapping scope in scoring logic
 [dependency] #38 (open) — scoring algorithm not yet decided
 [decision] #51 (human-decision) — UX flow for timer display unresolved
-[review] #44 (PR, waiting on review) — shared types refactor
 [external] blocked — waiting on API key from vendor
 ```
 
-If any data source was unavailable during Gather, note it:
+If `warnings` is non-empty, include them:
 
 ```
 Note: PR data unavailable — conflict detection may be incomplete.
