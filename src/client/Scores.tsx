@@ -20,25 +20,29 @@ type Props = {
   guesses?: [t.PlayerId, string][]
 }
 
-function RoundTopbar({ round, totalRounds, secsLeft }: {
-  round: number
-  totalRounds: number
-  secsLeft?: number
-}) {
+function RoundTopbar({ secsLeft }: { secsLeft?: number }) {
   return (
     <div className="screen-topbar">
-      <span>Round {round + 1} of {totalRounds}</span>
+      <span />
       {secsLeft !== undefined
-        ? <span><Timer secsLeft={secsLeft} />s</span>
+        ? <div className="timer">
+            <svg viewBox="0 0 50 50">
+              <circle cx="25" cy="25" r="20" />
+            </svg>
+            <Timer secsLeft={secsLeft} />
+          </div>
         : <span />
       }
     </div>
   )
 }
 
-function CategoryHeader({ category }: { category: string }) {
+function CategoryHeader({ category, round, totalRounds }: {
+  category: string, round: number, totalRounds: number
+}) {
   return (
     <div className="screen-header">
+      <h2>Round {round + 1} of {totalRounds}</h2>
       <h1>{category}</h1>
     </div>
   )
@@ -205,8 +209,8 @@ export function Scores({ gameId, playerId, playerName, mood, mailbox, scores, po
 
   return (
     <div className="screen">
-      <RoundTopbar round={round} totalRounds={totalRounds} secsLeft={secsLeft} />
-      <CategoryHeader category={category} />
+      <RoundTopbar secsLeft={secsLeft} />
+      <CategoryHeader category={category} round={round} totalRounds={totalRounds} />
       {positions && positions.length > 0
         ? <ScatterPlot positions={positions} playerId={playerId} nameOf={nameOf} guesses={guesses} />
         : <div className="visualization-placeholder" />

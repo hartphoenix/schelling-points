@@ -91,9 +91,8 @@ export function Guesses({ mailbox, playerId, gameId, category, secsLeft, hasGues
         </div>
       </div>
       <div className="screen-header">
-        <h2>Communicate Without Speaking</h2>
         <h1>Round {round + 1} of {totalRounds}</h1>
-        {/*should add the game id feature here */}
+        <h2>Communicate Without Speaking</h2>
       </div>
       <div className="category-display">
         <h1>{category}</h1>
