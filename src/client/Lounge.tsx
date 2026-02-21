@@ -2,7 +2,9 @@ import * as React from 'react'
 import * as t from './types'
 import { Box } from './mail'
 import { MoodPicker } from './MoodPicker'
+import { PlayerRing } from './PlayerRing'
 import { InstructionsPopover } from './InstructionsPopover'
+import { playerColor } from './playerColor'
 
 type Props = {
   mailbox: Box
@@ -30,6 +32,7 @@ export function Lounge({ mailbox, playerId, mood, otherPlayers }: Props) {
 
   function handleMoodChange(newMood: t.Mood) {
     setCurrentMood(newMood)
+    localStorage.setItem('mood', newMood)
     if (joined) {
       mailbox.send({ type: 'SET_PLAYER_INFO', playerId, playerName, mood: newMood })
     }
@@ -46,6 +49,7 @@ export function Lounge({ mailbox, playerId, mood, otherPlayers }: Props) {
           <h1 className="title">The Schelling Point</h1>
           <p className="subtitle">Do you & your friends think alike?</p>
         </div>
+        <PlayerRing />
         <div className="screen-footer">
           <input className="input"
             type="text"
@@ -64,33 +68,20 @@ export function Lounge({ mailbox, playerId, mood, otherPlayers }: Props) {
   return (
     <div className="screen lounge">
       <div className="screen-topbar">
-        <span />
+        <button className="btn-back">‹</button>
         <InstructionsPopover />
       </div>
       <div className="screen-header">
         <div className="title-block">
-          <h1 className="title">Lounge</h1>
+          <h1 className="title">Lobby</h1>
           <p className="subtitle">Do you & your friends think alike?</p>
         </div>
       </div>
-      
+      <PlayerRing players={otherPlayers} />
       <div className="screen-footer">
-        <div className="avatar-wrapper">
-          <div className="avatar-selected" style={{background: 'var(--cream)'}}>
-            {playerName.charAt(0)}
-          </div>
-          <span className="avatar-mood">{currentMood}</span>
-        </div>
-        <p>{otherPlayers.length} players online</p>
-        {/* <p>
-          {otherPlayers.map(([id, name, mood]) => (
-            <li key={id}>{name} {mood}</li>
-          ))}
-        </p> */}
+        <p>{otherPlayers.length + 1} players joined</p>
         <MoodPicker currentMood={currentMood} onSelect={handleMoodChange} />
         <button className="btn" onClick={handleNewGame}>New Game</button>
-        <button className="btn">Join Game (placeholder)</button>
-        {/* Implement join game function */}
       </div>
     </div>
   )

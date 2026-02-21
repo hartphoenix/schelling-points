@@ -1,88 +1,114 @@
 # Start Work
 
-Pre-work checks before beginning any task.
+Pre-work checks before beginning any task. Surfaces conflicts with
+active work so the human can make an informed choice.
 
 ## Usage
+
 `/startwork` — pick the highest-priority available task from the board
 `/startwork #<issue-number>` — start a specific issue
 
 ## Protocol
 
-### 1. Environment Check
+### 1. Gather
 
-1. Pull latest main (`git pull origin main`)
-2. Query the project board for all items in "Ready" and "Backlog" — not
-   just assigned ones (`gh project item-list 1 --owner thrialectics --format json`)
-3. Check blocked items for resolved conditions (see Blocking
-   Conditions below)
-4. Scan `.claude/todos/agent/` for stale working files (created >24h
-   ago) and surface them for verification
-5. Surface a brief summary before proceeding
+All data gathering is handled by a local script. Run:
 
-If GitHub is unreachable, warn and continue from local branch state.
-If there are no items in "Ready" or "Backlog", say so — don't treat it as an error.
+```
+git pull origin main && bun .claude/scripts/startwork-gather.ts
+```
 
-### 2. Rank & Screen
+The script outputs a single JSON object with:
+- `activeWork` — items In Progress, In Review, and open PRs
+- `candidates` — items in Ready and Backlog, each with pre-computed
+  `dependencies` (resolved or not) and `flags` (dependency, decision,
+  external)
+- `staleTodos` — agent todo files older than 24h
+- `warnings` — any data sources that failed
 
-If an issue number was provided, fetch it directly (skip to step 4).
+If the script fails entirely, warn and stop.
 
-Otherwise, rank all "Ready" and "Backlog" items using the following
-priority order. "Ready" items should generally surface above "Backlog"
-items at the same priority level. Within a tier, prefer items that
-also rank well in lower tiers.
+If there are no candidates, say so and stop.
 
-1. **Urgency and severity** — `p1-critical` and `p2-important` items
-   come first, regardless of assignee. An unassigned urgent task is
-   more important than an assigned low-priority one.
-2. **Assigned to the current user** — tasks explicitly assigned to
-   this team member take priority over unassigned or others' work.
-3. **Unblocks other work** — tasks that appear in another issue's
-   `### Dependencies` section (i.e., something else is waiting on
-   this task) should surface higher. Check for issues carrying the
-   `blocked` label that reference these items.
-4. **MVP-critical path** — tasks that provide foundational structure
-   the product needs to function (core game loop, essential UI flows,
-   shared infrastructure) rank above nice-to-have improvements.
+If `staleTodos` is non-empty, surface them for verification.
 
-After ranking, screen each candidate for issues that the user should
-know about before choosing:
+### 2. Detect
 
-- **Duplicates** — search open PRs and in-progress board items for
-  overlapping scope. Flag any items that already have work in flight.
-- **Scope conflicts** — for each candidate, check ALL non-Done issues
-  for overlapping domain. Flag when a candidate answers, implements,
-  or presupposes decisions from another open issue — especially when
-  an `agent-resolvable` task overlaps with an unresolved
-  `human-decision` or `architecture` issue.
-- **Blockers** — check for unresolved blocking conditions (see
-  definitions below). Flag but don't hide blocked items.
+The script pre-computes structural flags (dependency, decision,
+external) from labels and `### Dependencies` sections. You only need
+to add **semantic conflict detection**:
 
-### 3. Present the Task
+For each candidate, check against `activeWork.inProgress` and
+`activeWork.openPRs`:
 
-Show the top candidates as an ordered recommendation. For each item,
-note why it ranks where it does and any flags from screening
-(duplicate work, blockers). Let the user choose.
+| Type | Definition | How to detect |
+|------|-----------|---------------|
+| conflict | Another PR or In Progress task overlaps in scope | Compare titles/descriptions for overlapping scope. Flag as "possible conflict" with low confidence. If open PRs have file lists, check for file overlap with the candidate's likely files. |
 
-### 4. Validate Selection
+Append any conflict flags to the candidate's existing `flags` array.
+
+### 3. Rank
+
+Rank all candidates (Ready + Backlog) using these priority tiers.
+Ready items surface above Backlog items at the same tier. Within a
+tier, prefer items that also rank well in lower tiers.
+
+1. **Urgency** — `p1-critical` and `p2-important` first, regardless
+   of assignee
+2. **Assigned to current user** — user's tasks above unassigned or
+   others' work
+3. **Unblocks other work** — check if any issue in the full candidate
+   or active work list has a dependency on this candidate (i.e., this
+   candidate's number appears in another issue's `dependencies` array)
+4. **MVP-critical path** — foundational structure the product needs
+   (core game loop, essential UI flows, shared infrastructure) above
+   nice-to-have improvements
+
+**Then demote:** Any candidate with one or more flags ranks below all
+clean (unflagged) candidates at the same priority tier. Within the
+demoted group, preserve the original tier ordering.
+
+If a specific issue was provided via `/startwork #N`, skip ranking
+and proceed directly to Present (step 4) to show its flags.
+
+### 4. Present
+
+Show the top candidates as an ordered list. For each item, show:
+
+- Why it ranks where it does (tier + assignment)
+- Any flags, one line per flag with link:
+
+```
+[conflict] #42 (In Progress, Ulysse) — overlapping scope in scoring logic
+[dependency] #38 (open) — scoring algorithm not yet decided
+[decision] #51 (human-decision) — UX flow for timer display unresolved
+[external] blocked — waiting on API key from vendor
+```
+
+If `warnings` is non-empty, include them:
+
+```
+Note: PR data unavailable — conflict detection may be incomplete.
+```
+
+Let the user choose.
+
+### 5. Validate
 
 After the user picks a task, run these checks on the selected item:
 
-- **Blocking conditions** — if blocked, surface the specific reason
+- **Blocking conditions** — if flagged, surface the specific flags
   and ask whether to proceed anyway or pick a different task.
 - **WIP limit** — count "In Progress" items for the assignee. If at
   or above their limit (from CLAUDE.md team table), warn and ask for
   confirmation.
 
-### 5. Move to "In Progress"
+### 6. Activate
 
-Update the board item status.
-
-### 6. Set Up the Branch
-
-Create or checkout the feature branch using the
-`<person>/<short-description>` convention.
+Update the board item status to "In Progress". Create or checkout the
+feature branch using the `<person>/<short-description>` convention.
 
 ### 7. Summary
 
-Print what's being worked on, the branch name, and any warnings
-surfaced above.
+Print what's being worked on, the branch name, and any flags that
+were acknowledged during Validate.

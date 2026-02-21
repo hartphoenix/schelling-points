@@ -4,8 +4,10 @@ import { Box } from './mail'
 import type { JSX } from 'react'
 import { QRCode } from 'react-qrcode-logo'
 import { Timer } from './components/timer'
+import { PlayerRing } from './PlayerRing'
 import { MoodPicker } from './MoodPicker'
 import { InstructionsPopover } from './InstructionsPopover'
+import { playerColor } from './playerColor'
 
 type Props = {
   mailbox: Box
@@ -19,21 +21,6 @@ type Props = {
 }
 
 export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, mood, playerName, otherPlayers }: Props) {
-  // Build a name lookup from otherPlayers
-  const nameOf = new Map(otherPlayers.map(([id, name]) => [id, name]))
-  const moodOf = new Map(otherPlayers.map(([id, name, mood]) => [id, mood]))
-
-  const colors = [                                                              
-    '--pink', '--pink-light',                                                 
-    '--coral', '--coral-light',                                                 
-    '--gold', '--gold-light',                                                   
-    '--green', '--green-light',                                                 
-    '--teal', '--teal-light',                                                   
-    '--blue', '--blue-light',                                                   
-    '--cyan', '--cyan-light',                                                   
-    '--lavender', '--lavender-light',
-    '--purple', '--purple-light',
-  ]
   const [currentMood, setCurrentMood] = React.useState(mood)
 
   function handleMoodChange(newMood: t.Mood) {
@@ -99,7 +86,7 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, mood, play
     <div className="screen lobby">
       <div className="screen-topbar">
         <button className="btn-back">‹</button>
-        <InstructionsPopover />
+        <InstructionsPopover autoShow={!localStorage.getItem('schelling-instructions-seen')} />
       </div>
       <div className="screen-header">
         <h1>Lobby</h1>
@@ -108,17 +95,8 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, mood, play
           {qrCodeButton(gameId)}
         </h2>
       </div>
-      <div className="players-joined">
-        {isReady.filter(([id, ready]) => ready).map(([id, ready], index) =>
-          <div className="avatar-wrapper" key={id}>
-            <div className="player-avatar" style={{background:
-            `var(${colors[index % colors.length]})`}}>
-              {nameOf.get(id)?.charAt(0)}
-        </div>
-              <span className="avatar-mood">{moodOf.get(id)}</span>
-            </div>
-        )}
-      </div>
+      <PlayerRing players={otherPlayers} isReady={isReady} />
+      <p>{otherPlayers.length + 1} players joined</p>
       {secsLeft !== undefined
         && <p>Starting in <Timer secsLeft={secsLeft} />...</p>}
       <div className="screen-footer">

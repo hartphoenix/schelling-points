@@ -32,10 +32,6 @@ api.addWebsockets(
     app,
 )
 
-api.addRest(
-    app,
-)
-
 api.addStatic(
     app,
 )

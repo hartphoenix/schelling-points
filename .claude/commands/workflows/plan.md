@@ -114,7 +114,11 @@ Run these agents in parallel:
 
 ### 1.6. Consolidate Research
 
-After all research steps complete, consolidate findings:
+After all research steps complete, verify each agent returned a non-empty
+result. If any agent returned empty or errored, note which analysis is
+missing (e.g., "Learnings search unavailable — agent returned empty").
+
+Consolidate findings:
 
 - Document relevant file paths from repo research (e.g., `app/services/example_service.rb:42`)
 - **Include relevant institutional learnings** from `docs/solutions/` (key insights, gotchas to avoid)

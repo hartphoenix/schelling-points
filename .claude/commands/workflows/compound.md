@@ -78,6 +78,11 @@ Launch these subagents IN PARALLEL. Each returns text data to the orchestrator.
 
 **WAIT for all Phase 1 subagents to complete before proceeding.**
 
+**Verify completeness:** After all agents return, check that each returned
+a non-empty result. If any agent returned empty or errored, note which
+analysis is missing in the final document (e.g., "Session log analysis
+unavailable — no recent session logs found").
+
 The orchestrating agent (main conversation) performs these steps:
 
 1. Collect all text results from Phase 1 subagents
@@ -106,17 +111,10 @@ The orchestrating agent (main conversation) performs these steps:
 
 - File: `docs/solutions/[category]/[filename].md`
 
-**Categories auto-detected from problem:**
-
-- build-errors/
-- test-failures/
-- runtime-errors/
-- performance-issues/
-- database-issues/
-- security-issues/
-- ui-bugs/
-- integration-issues/
-- logic-errors/
+**Categories:** Auto-detected from the problem. See
+`.claude/skills/compound-docs/schema.yaml` for the canonical `problem_type`
+list. Use an existing category directory when one fits; create a new one
+(kebab-case) when none does.
 
 ## The Compounding Philosophy
 

@@ -7,6 +7,8 @@ import { Lounge } from "./client/Lounge"
 import { Lobby } from "./client/Lobby"
 import { Scores } from "./client/Scores"
 import { ScreenBackground } from './client/ScreenBackground'
+import { PlayerRing } from "./client/PlayerRing"
+import { MoodPicker } from './client/MoodPicker'
 import '../static/styles/global.css'
 import '../static/styles/lounge.css'                                          
 import '../static/styles/lobby.css'                                           
@@ -15,8 +17,7 @@ import '../static/styles/scores.css'
 import '../static/styles/mood-picker.css'
 import '../static/styles/instructions.css'
 import '../static/styles/screen-background.css'
-
-import { MoodPicker } from './client/MoodPicker'
+import '../static/styles/radial-visualization.css'
 
 const router = Router.createBrowserRouter([
   {
@@ -48,10 +49,10 @@ function onMessage(state: t.State, message: t.ToClientMessage): t.State {
       return { ...state, view: { type: 'LOBBY', gameId: message.gameId, isReady: message.isReady } }
 
     case 'GUESS_STATE':
-      return { ...state, view: { type: 'GUESSES', gameId: message.gameId, hasGuessed: message.hasGuessed, category: message.category, secsLeft: message.secsLeft } }
+      return { ...state, view: { type: 'GUESSES', gameId: message.gameId, hasGuessed: message.hasGuessed, category: message.category, secsLeft: message.secsLeft, round: message.round, totalRounds: message.totalRounds } }
 
     case 'SCORE_STATE':
-      return { ...state, view: { type: 'SCORES', gameId: message.gameId, scores: message.playerScores, positions: message.positions, guesses: message.guesses, category: message.category, isReady: message.isReady, secsLeft: message.secsLeft } }
+      return { ...state, view: { type: 'SCORES', gameId: message.gameId, scores: message.playerScores, positions: message.positions, guesses: message.guesses, category: message.category, isReady: message.isReady, secsLeft: message.secsLeft, round: message.round, totalRounds: message.totalRounds } }
 
     case 'LOBBY_COUNTDOWN': {
       const isReady = state.view.type === 'LOBBY' ? state.view.isReady : []
@@ -112,6 +113,7 @@ function App({ gameId }: Props) {
           <h1 className="title">The Schelling Point</h1>
           <p className="subtitle">Do you & your friends think alike?</p>
         </div>
+        <PlayerRing />
         <div className="screen-footer">
           <input className="input"
             type="text"
@@ -157,12 +159,16 @@ function App({ gameId }: Props) {
         category={state.view.category}
         secsLeft={state.view.secsLeft}
         hasGuessed={state.view.hasGuessed}
+        round={state.view.round}
+        totalRounds={state.view.totalRounds}
       />
 
     case 'SCORES':
       return <Scores
         gameId={state.view.gameId}
         playerId={state.playerId}
+        playerName={playerName}
+        mood={currentMood}
         mailbox={state.mailbox}
         scores={state.view.scores}
         positions={state.view.positions}
@@ -171,6 +177,8 @@ function App({ gameId }: Props) {
         otherPlayers={state.otherPlayers}
         isReady={state.view.isReady}
         secsLeft={state.view.secsLeft}
+        round={state.view.round}
+        totalRounds={state.view.totalRounds}
       />
 
     // minimal error boundary in case extra views added later
