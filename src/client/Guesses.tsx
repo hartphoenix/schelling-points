@@ -3,6 +3,7 @@ import * as t from './types'
 import { Box } from './mail'
 import { Timer } from './components/timer'
 import { playerColor } from './playerColor'
+import { LeaveGameDialog } from './LeaveGameDialog'
 
 function GuessInput(props: { onSubmit: (guess: string) => void, locked: boolean }) {
   const [guess, setGuess] = React.useState('')
@@ -69,6 +70,8 @@ type Props = {
 }
 
 export function Guesses({ mailbox, playerId, gameId, category, secsLeft, hasGuessed, round, totalRounds }: Props) {
+  const [showLeaveDialog, setShowLeaveDialog] = React.useState(false)
+
   function handleSubmit(guess: string) {
     mailbox.send({
       type: 'GUESS',
@@ -78,11 +81,19 @@ export function Guesses({ mailbox, playerId, gameId, category, secsLeft, hasGues
     })
   }
 
+  function handleLeave() {
+    mailbox.send({ type: 'LEAVE_GAME', gameId, playerId })
+  }
+
   return (
     <div className="screen guesses">
+      <LeaveGameDialog
+        open={showLeaveDialog}
+        onConfirm={handleLeave}
+        onCancel={() => setShowLeaveDialog(false)}
+      />
       <div className="screen-topbar">
-        <button className="btn-back">‹</button>
-        {/*add leave function for btn-back and instructions popover button*/}
+        <button className="btn-back" onClick={() => setShowLeaveDialog(true)}>‹</button>
         <div className="timer">
           <svg viewBox="0 0 50 50">
             <circle cx="25" cy="25" r="20" />

@@ -254,6 +254,61 @@ export function onClientMessage(state: t.State, message: t.ToServerMessage, webS
       break
     }
 
+    case 'LEAVE_GAME': {
+      const game = state.games.get(message.gameId)
+      if (!game) {
+        console.warn('LEAVE_GAME: game not found', message.gameId)
+        break
+      }
+
+      const playerIndex = game.players.findIndex(p => p.id === message.playerId)
+      if (playerIndex === -1) {
+        console.warn('LEAVE_GAME: player not in game', message.playerId)
+        break
+      }
+
+      const playerInfo = game.players[playerIndex]
+
+      // Remove from game
+      game.players.splice(playerIndex, 1)
+
+      // Clean up phase-specific state
+      if (game.phase.type === 'LOBBY') {
+        game.phase.isReady.delete(message.playerId)
+      } else if (game.phase.type === 'SCORES') {
+        game.phase.isReady.delete(message.playerId)
+      }
+
+      // Send LOUNGE to the leaving player so their view transitions
+      if (playerInfo.webSocket.readyState === WebSocket.OPEN) {
+        const loungePlayerList: [t.PlayerId, t.PlayerName, t.Mood][] =
+          [...state.lounge.entries()].map(([id, info]) => [id, info.name, info.mood])
+        playerInfo.webSocket.send(JSON.stringify({
+          type: 'LOUNGE',
+          loungingPlayers: loungePlayerList,
+        }))
+      }
+
+      // Add player back to lounge
+      state.lounge.set(message.playerId, {
+        name: playerInfo.name,
+        mood: playerInfo.mood,
+        webSocket: playerInfo.webSocket,
+      })
+
+      // Update remaining game players
+      if (game.players.length > 0) {
+        game.broadcast(game.memberChangeMessage(message.gameId))
+        game.broadcast(currentGameState(message.gameId, game))
+      } else {
+        state.games.delete(message.gameId)
+      }
+
+      // Update lounge players (including the returning player)
+      state.broadcastLoungeChange()
+      break
+    }
+
     case 'GUESS': {
       const game = state.games.get(message.gameId)
       if (!game || game.phase.type !== 'GUESSES') {

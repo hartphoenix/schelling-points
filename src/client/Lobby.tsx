@@ -85,10 +85,14 @@ export function Lobby({ mailbox, playerId, gameId, isReady, secsLeft, mood, play
     </>)
   }
 
+  function handleLeave() {
+    mailbox.send({ type: 'LEAVE_GAME', gameId, playerId })
+  }
+
   return (
     <div className="screen lobby">
       <div className="screen-topbar">
-        <button className="btn-back">‹</button>
+        <button className="btn-back" onClick={handleLeave}>‹</button>
         <InstructionsPopover autoShow={!localStorage.getItem('schelling-instructions-seen')} />
       </div>
       <div className="screen-header">

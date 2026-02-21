@@ -11,6 +11,7 @@ export type ToServerMessage =
   | { type: 'LOBBY_READY', gameId: GameId, playerId: PlayerId, isReady: boolean }
   | { type: 'SCORES_READY', gameId: GameId, playerId: PlayerId, isReady: boolean }
   | { type: 'GUESS', gameId: GameId, playerId: PlayerId, guess: string }
+  | { type: 'LEAVE_GAME', gameId: GameId, playerId: PlayerId }
 
 export type ToClientMessage =
   | { type: 'LOUNGE', loungingPlayers: [PlayerId, PlayerName, Mood][] }

@@ -18,6 +18,7 @@ import '../static/styles/mood-picker.css'
 import '../static/styles/instructions.css'
 import '../static/styles/screen-background.css'
 import '../static/styles/radial-visualization.css'
+import '../static/styles/leave-dialog.css'
 
 const router = Router.createBrowserRouter([
   {

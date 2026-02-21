@@ -2,6 +2,7 @@ import * as t from './types'
 import * as React from 'react'
 import { Timer } from './components/timer'
 import { playerColor } from './playerColor'
+import { LeaveGameDialog } from './LeaveGameDialog'
 
 type Props = {
   gameId: t.GameId
@@ -20,13 +21,15 @@ type Props = {
   guesses?: [t.PlayerId, string][]
 }
 
-function RoundTopbar({ round, totalRounds, secsLeft }: {
+function RoundTopbar({ round, totalRounds, secsLeft, onBack }: {
   round: number
   totalRounds: number
   secsLeft?: number
+  onBack: () => void
 }) {
   return (
     <div className="screen-topbar">
+      <button className="btn-back" onClick={onBack}>‹</button>
       <span>Round {round + 1} of {totalRounds}</span>
       {secsLeft !== undefined
         ? <span><Timer secsLeft={secsLeft} />s</span>
@@ -171,6 +174,12 @@ function ScatterPlot({ positions, playerId, nameOf, guesses }: {
 }
 
 export function Scores({ gameId, playerId, playerName, mood, mailbox, scores, positions, category, otherPlayers, isReady, secsLeft, round, totalRounds, guesses }: Props) {
+  const [showLeaveDialog, setShowLeaveDialog] = React.useState(false)
+
+  function handleLeave() {
+    mailbox.send({ type: 'LEAVE_GAME', gameId, playerId })
+  }
+
   const nameOf = new Map(otherPlayers.map(([id, name]) => [id, name]))
   nameOf.set(playerId, playerName)
 
@@ -205,7 +214,12 @@ export function Scores({ gameId, playerId, playerName, mood, mailbox, scores, po
 
   return (
     <div className="screen">
-      <RoundTopbar round={round} totalRounds={totalRounds} secsLeft={secsLeft} />
+      <LeaveGameDialog
+        open={showLeaveDialog}
+        onConfirm={handleLeave}
+        onCancel={() => setShowLeaveDialog(false)}
+      />
+      <RoundTopbar round={round} totalRounds={totalRounds} secsLeft={secsLeft} onBack={() => setShowLeaveDialog(true)} />
       <CategoryHeader category={category} />
       {positions && positions.length > 0
         ? <ScatterPlot positions={positions} playerId={playerId} nameOf={nameOf} guesses={guesses} />
@@ -214,9 +228,7 @@ export function Scores({ gameId, playerId, playerName, mood, mailbox, scores, po
       <MyResult guess={myGuess} score={myScore} />
       <AllResultsDropdown results={allResults} />
       {isGameOver
-        ? <GameOverFooter standings={standings} onBackToLounge={() => {
-            mailbox.send({ type: 'JOIN_LOUNGE', playerId, playerName, mood })
-          }} />
+        ? <GameOverFooter standings={standings} onBackToLounge={handleLeave} />
         : <ReadyFooter isReady={amReady} onToggle={handleToggleReady} />
       }
     </div>

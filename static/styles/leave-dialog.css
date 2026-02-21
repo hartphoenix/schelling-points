@@ -1,0 +1,63 @@
+.leave-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 80px;
+  z-index: 100;
+}
+
+.leave-dialog {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 340px;
+  width: 100%;
+  text-align: center;
+  color: var(--cream);
+}
+
+.leave-dialog h2 {
+  font-family: var(--font-fancy);
+  font-size: 1.5rem;
+  letter-spacing: 0.01em;
+  margin-bottom: 8px;
+}
+
+.leave-dialog p {
+  font-family: var(--font-body);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  font-weight: 300;
+  line-height: 1.5;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  margin-bottom: 20px;
+}
+
+.leave-dialog-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.leave-dialog-stay,
+.leave-dialog-leave {
+  flex: 1;
+}
+
+.leave-dialog-leave {
+  background: rgba(255, 80, 80, 0.2);
+  border-color: rgba(255, 80, 80, 0.3);
+}
+
+.leave-dialog-leave:hover {
+  background: rgba(255, 80, 80, 0.3);
+}
