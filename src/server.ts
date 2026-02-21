@@ -4,6 +4,7 @@ import * as names from './server/names'
 import * as play from './server/play'
 import * as t from './server/types'
 import * as categories from './server/categories'
+import { loadVocab } from './server/vocab'
 
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -14,6 +15,8 @@ const allCategories = categories.load(
     __dirname + '/../src/server/categories.json'
 )
 
+const vocab = loadVocab()
+
 const state: t.State = new t.State(
     new names.Chooser(
         [
@@ -22,6 +25,7 @@ const state: t.State = new t.State(
         ],
     ),
     allCategories,
+    vocab,
 )
 
 const app = express()

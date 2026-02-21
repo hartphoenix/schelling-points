@@ -81,7 +81,7 @@ export function Lounge({ mailbox, playerId, mood, otherPlayers }: Props) {
       </div>
       <PlayerRing players={otherPlayers} />
       <div className="screen-footer">
-        <p>{otherPlayers.length + 1} players joined</p>
+        <p>{otherPlayers.length} players joined</p>
         <MoodPicker currentMood={currentMood} onSelect={handleMoodChange} />
         <button className="btn" onClick={handleNewGame}>New Game</button>
       </div>

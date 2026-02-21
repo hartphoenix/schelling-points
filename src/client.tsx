@@ -5,15 +5,17 @@ import * as t from "./client/types"
 import { Guesses } from "./client/Guesses"
 import { Lounge } from "./client/Lounge"
 import { Lobby } from "./client/Lobby"
-import { Scores } from "./client/Scores"
+import { Reveal } from "./client/Reveal"
+import { GameEnd } from "./client/GameEnd"
 import { ScreenBackground } from './client/ScreenBackground'
 import { PlayerRing } from "./client/PlayerRing"
 import { MoodPicker } from './client/MoodPicker'
 import '../static/styles/global.css'
-import '../static/styles/lounge.css'                                          
-import '../static/styles/lobby.css'                                           
-import '../static/styles/guesses.css'    
-import '../static/styles/scores.css'
+import '../static/styles/lounge.css'
+import '../static/styles/lobby.css'
+import '../static/styles/guesses.css'
+import '../static/styles/reveal.css'
+import '../static/styles/game-end.css'
 import '../static/styles/mood-picker.css'
 import '../static/styles/instructions.css'
 import '../static/styles/screen-background.css'
@@ -49,10 +51,37 @@ function onMessage(state: t.State, message: t.ToClientMessage): t.State {
       return { ...state, view: { type: 'LOBBY', gameId: message.gameId, isReady: message.isReady } }
 
     case 'GUESS_STATE':
-      return { ...state, view: { type: 'GUESSES', gameId: message.gameId, hasGuessed: message.hasGuessed, category: message.category, secsLeft: message.secsLeft, round: message.round, totalRounds: message.totalRounds } }
+      return { ...state, view: { type: 'GUESSES', gameId: message.gameId, hasGuessed: message.hasGuessed, prompt: message.prompt, secsLeft: message.secsLeft, round: message.round, totalRounds: message.totalRounds } }
 
-    case 'SCORE_STATE':
-      return { ...state, view: { type: 'SCORES', gameId: message.gameId, scores: message.playerScores, positions: message.positions, guesses: message.guesses, category: message.category, isReady: message.isReady, secsLeft: message.secsLeft, round: message.round, totalRounds: message.totalRounds } }
+    case 'REVEAL_STATE':
+      return { ...state, view: {
+        type: 'REVEAL', gameId: message.gameId,
+        centroidWord: message.centroidWord,
+        centroidIsRepeat: message.centroidIsRepeat,
+        positions: message.positions,
+        guesses: message.guesses,
+        melded: message.melded,
+        round: message.round,
+        totalRounds: message.totalRounds,
+        secsLeft: message.secsLeft,
+        isReady: message.isReady,
+      }}
+
+    case 'GAME_END':
+      return { ...state, view: {
+        type: 'GAME_END', gameId: message.gameId,
+        melded: message.melded,
+        meldRound: message.meldRound,
+        centroidHistory: message.centroidHistory,
+        playerHistory: message.playerHistory,
+      }}
+
+    case 'CONTINUE_PROMPT':
+      return { ...state, view: {
+        type: 'CONTINUE', gameId: message.gameId,
+        centroidHistory: message.centroidHistory,
+        playerHistory: message.playerHistory,
+      }}
 
     case 'LOBBY_COUNTDOWN': {
       const isReady = state.view.type === 'LOBBY' ? state.view.isReady : []
@@ -156,29 +185,55 @@ function App({ gameId }: Props) {
         mailbox={state.mailbox}
         playerId={state.playerId}
         gameId={state.view.gameId}
-        category={state.view.category}
+        prompt={state.view.prompt}
         secsLeft={state.view.secsLeft}
         hasGuessed={state.view.hasGuessed}
         round={state.view.round}
         totalRounds={state.view.totalRounds}
       />
 
-    case 'SCORES':
-      return <Scores
+    case 'REVEAL':
+      return <Reveal
         gameId={state.view.gameId}
         playerId={state.playerId}
         playerName={playerName}
         mood={currentMood}
         mailbox={state.mailbox}
-        scores={state.view.scores}
+        centroidWord={state.view.centroidWord}
+        centroidIsRepeat={state.view.centroidIsRepeat}
         positions={state.view.positions}
         guesses={state.view.guesses}
-        category={state.view.category}
-        otherPlayers={state.otherPlayers}
-        isReady={state.view.isReady}
-        secsLeft={state.view.secsLeft}
+        melded={state.view.melded}
         round={state.view.round}
         totalRounds={state.view.totalRounds}
+        secsLeft={state.view.secsLeft}
+        isReady={state.view.isReady}
+        otherPlayers={state.otherPlayers}
+      />
+
+    case 'GAME_END':
+      return <GameEnd
+        gameId={state.view.gameId}
+        playerId={state.playerId}
+        playerName={playerName}
+        mood={currentMood}
+        mailbox={state.mailbox}
+        melded={state.view.melded}
+        meldRound={state.view.meldRound}
+        centroidHistory={state.view.centroidHistory}
+        playerHistory={state.view.playerHistory}
+      />
+
+    case 'CONTINUE':
+      return <GameEnd
+        gameId={state.view.gameId}
+        playerId={state.playerId}
+        playerName={playerName}
+        mood={currentMood}
+        mailbox={state.mailbox}
+        isContinue
+        centroidHistory={state.view.centroidHistory}
+        playerHistory={state.view.playerHistory}
       />
 
     // minimal error boundary in case extra views added later

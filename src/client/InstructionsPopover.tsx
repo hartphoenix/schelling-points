@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { useSwipeable } from 'react-swipeable'
 
-const cards = [
-  { title: 'How to Play', body: 'You\'ll see a category. Type the answer you think everyone else will say too.' },
-  { title: 'Scoring', body: 'Close answers earn points too. If "dog" is the Schelling Point, "puppy" scores as a close match.' },
-  { title: 'Good Luck!', body: '10 rounds. The most popular answer gets you the most points.' },
+const cards: { title: string; body: React.ReactNode }[] = [
+  { title: 'How to Play', body: <>The game begins with a category prompt, and your job is to guess what word everyone <em>else</em> will guess. It's large-scale <strong>Mind-Meld</strong>.</> },
+  { title: 'The Clues', body: <>Each round, you'll get a hint about what everyone guessed. Everyone sees the same clue. Guess again. (If your guess is the same as the current clue, it'll be thrown out – so get creative).</> },
+  { title: 'The Goal', body: <>By the end of 20 rounds, get everyone to guess the same word at the same time. You'll have just 10 seconds for each guess, so let 'er rip!</> },
 ]
 
 type Props = {
