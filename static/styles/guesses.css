@@ -6,6 +6,8 @@
     align-items: center;
     padding: 20px;
     flex: 1;
+    min-height: 0;
+    overflow-y: auto;
 }
 
 .category-display h1 {
@@ -23,6 +25,7 @@
     justify-content: center;
     gap: 12px;
     max-width: 80%;
+    flex-shrink: 0;
 }
 .player-progress-dots {
     display: flex;

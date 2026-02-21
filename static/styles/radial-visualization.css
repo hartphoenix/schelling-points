@@ -1,7 +1,10 @@
 .ring-container{
     width: 340px;
-    height: 340px;
+    max-width: 100%;
+    aspect-ratio: 1;
     position: relative;
+    flex-shrink: 1;
+    min-height: 0;
 }
 
 .ring {
