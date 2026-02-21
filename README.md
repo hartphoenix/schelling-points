@@ -3,11 +3,10 @@ A Jackbox TV-like mobile word game.
 
 ## Docker
 
-Requires an [Ollama](https://ollama.com) instance for generating vocab embeddings on first startup.
+Requires [Ollama](https://ollama.com) running locally to generate vocab embeddings.
 
 ```bash
+OLLAMA_URL=http://localhost:11434 bun run scripts/build-vocab-embeddings.ts
 docker build -t schellingpoint .
-docker run -e OLLAMA_URL=http://host.docker.internal:11434 -p 8000:8000 schellingpoint
+docker run -p 8000:8000 schellingpoint
 ```
-
-The container generates vocab embeddings on first boot (~30s), then starts the server on port 8000.

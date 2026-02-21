@@ -1,6 +1,5 @@
 node_modules
 dist
-data/vocab-embeddings.json
 .claude
 .git
 docs
