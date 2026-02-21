@@ -60,7 +60,9 @@ export async function fetchEmbeddings(texts: string[]): Promise<number[][]> {
 }
 
 export function similarityToScore(sim: number): number {
-  return Math.round(1 + Math.max(0, (sim - config.SIMILARITY_FLOOR) / (1 - config.SIMILARITY_FLOOR)) * (config.BASE_MAX_SCORE - 1))
+  const normalized = Math.max(0, (sim - config.SIMILARITY_FLOOR) / (1 - config.SIMILARITY_FLOOR))
+  const curved = Math.pow(normalized, config.SCORE_CURVE_POWER)
+  return Math.round(1 + curved * (config.BASE_MAX_SCORE - 1))
 }
 
 export async function scoreGuesses(guesses: Map<PlayerId, string>): Promise<ScoringResult> {
