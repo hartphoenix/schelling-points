@@ -12,32 +12,32 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 // TODO: Path may need adjusting for production (navigates from dist/ back to src/)
 const allCategories = categories.load(
-    __dirname + '/../src/server/categories.json'
+  __dirname + '/../src/server/categories.json'
 )
 
 const vocab = loadVocab()
 
 const state: t.State = new t.State(
-    new names.Chooser(
-        [
-            __dirname + '/../static/adjectives.txt',
-            __dirname + '/../static/nouns.txt',
-        ],
-    ),
-    allCategories,
-    vocab,
+  new names.Chooser(
+    [
+      __dirname + '/../static/adjectives.txt',
+      __dirname + '/../static/nouns.txt',
+    ],
+  ),
+  allCategories,
+  vocab,
 )
 
 const app = express()
 app.use(express.json())
 
 api.addWebsockets(
-    state,
-    app,
+  state,
+  app,
 )
 
 api.addStatic(
-    app,
+  app,
 )
 
 play.startTicking(state, 100)
